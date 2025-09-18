@@ -2,241 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Expense & Budget Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fun Expense Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <style>
-    body {
-      font-family: Poppins, sans-serif;
-      background: linear-gradient(135deg, #74ebd5, #9face6);
-      margin: 0;
-      padding: 20px;
-    }
-    header {
-      text-align: center;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-    .card {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-    input, select, button {
-      padding: 6px;
-      margin: 5px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    th, td {
-      padding: 10px;
-      text-align: center;
-      border-bottom: 1px solid #ddd;
-    }
-    th {
-      background: #f0f0f0;
-    }
-    .progress {
-      background: #eee;
-      border-radius: 10px;
-      height: 25px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-    .progress-bar {
-      height: 100%;
-      text-align: center;
-      color: white;
-      line-height: 25px;
-    }
-    .layout {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 20px;
-    }
-  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
   <header>
-    <h1> Expense & Budget Tracker</h1>
+    <h1><i class="fa-solid fa-wallet"></i>  Expense Tracker</h1>
+    <button id="toggleTheme"><i class="fa-solid fa-moon"></i></button>
   </header>
 
-  <!-- Budget Section -->
-  <div class="card">
-    <label><b>Set Monthly Budget (₹):</b></label>
-    <input type="number" id="budgetInput">
-    <button onclick="setBudget()">Save Budget</button>
+  <nav>
+    <button onclick="showPage('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+    <button onclick="showPage('addIncome')"><i class="fa-solid fa-arrow-down"></i> Add Income</button>
+    <button onclick="showPage('addExpense')"><i class="fa-solid fa-arrow-up"></i> Add Expense</button>
+    <button onclick="showPage('reports')"><i class="fa-solid fa-table"></i> Reports</button>
+  </nav>
 
-    <div class="progress">
-      <div id="progressBar" class="progress-bar">0%</div>
-    </div>
-    <p id="budgetMsg">Set a budget to track your spending</p>
-  </div>
+  <main>
+    <!-- Dashboard -->
+    <section id="dashboard" class="page">
+      <h2>Dashboard</h2>
+      <div class="cards">
+        <div class="card income"><i class="fa-solid fa-money-bill-wave"></i> Total Income: ₹<span id="totalIncome">0</span></div>
+        <div class="card expense"><i class="fa-solid fa-credit-card"></i> Total Expenses: ₹<span id="totalExpenses">0</span></div>
+        <div class="card savings"><i class="fa-solid fa-coins"></i> Savings: ₹<span id="savings">0</span></div>
+      </div>
+      <div>
+        <label for="monthFilter">Filter Month: </label>
+        <input type="month" id="monthFilter">
+      </div>
+      <h3>Recent Transactions</h3>
+      <ul id="recentTransactions" class="animate__animated animate__fadeIn"></ul>
+    </section>
 
-  <!-- Add Expense Form -->
-  <div class="card">
-    <form id="expenseForm">
-      <input name="title" placeholder="Expense Title" required>
-      <input name="amount" type="number" placeholder="Amount" required>
-      <select name="category" required>
-        <option value="">Category</option>
-        <option value="Food">🥗 Food</option>
-        <option value="Travel">✈️ Travel</option>
-        <option value="Entertainment">🎬 Entertainment</option>
-        <option value="Shopping">🛍️ Shopping</option>
-        <option value="Other">💡 Other</option>
-      </select>
-      <input name="date" type="date" required>
-      <button type="submit">➕ Add Expense</button>
-    </form>
-  </div>
+    <!-- Add Income -->
+    <section id="addIncome" class="page">
+      <h2>Add Income</h2>
+      <form id="incomeForm">
+        <input type="number" id="incomeAmount" placeholder="Amount" required>
+        <input type="text" id="incomeSource" placeholder="Source (Salary, Gift, etc.)" required>
+        <input type="date" id="incomeDate" required>
+        <button type="submit"><i class="fa-solid fa-plus"></i> Add Income</button>
+      </form>
+    </section>
 
-  <!-- Summary -->
-  <div class="card">
-    <b>Total Spent:</b> ₹<span id="totalSpent">0</span> |
-    <b>Highest Category:</b> <span id="highestCategory">-</span>
-  </div>
+    <!-- Add Expense -->
+    <section id="addExpense" class="page">
+      <h2>Add Expense</h2>
+      <form id="expenseForm">
+        <input type="number" id="expenseAmount" placeholder="Amount" required>
+        <input type="text" id="expenseCategory" placeholder="Category (Food, Transport, etc.)" required>
+        <input type="text" id="expenseTag" placeholder="Tag (optional)">
+        <input type="date" id="expenseDate" required>
+        <label><input type="checkbox" id="expenseRecurring"> Recurring Monthly</label>
+        <button type="submit"><i class="fa-solid fa-plus"></i> Add Expense</button>
+      </form>
+    </section>
 
-  <!-- Table + Chart -->
-  <div class="layout">
-    <!-- Table -->
-    <table>
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Amount</th>
-          <th>Category</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody id="expenseTable"></tbody>
-    </table>
+    <!-- Reports -->
+    <section id="reports" class="page">
+      <h2>Reports</h2>
+      <canvas id="expenseChart" width="400" height="200"></canvas>
+      <button onclick="exportCSV()"><i class="fa-solid fa-download"></i> Export CSV</button>
+    </section>
+  </main>
 
-    <!-- Chart -->
-    <div class="card" style="text-align: center;">
-      <h3>📊 Spending Breakdown</h3>
-      <canvas id="pieChart" width="250" height="250"></canvas>
-    </div>
-  </div>
-
-  <script>
-    let expenses = [];
-    let budget = 0;
-
-    const expenseForm = document.getElementById("expenseForm");
-    const expenseTable = document.getElementById("expenseTable");
-    const totalSpentEl = document.getElementById("totalSpent");
-    const highestCategoryEl = document.getElementById("highestCategory");
-    const progressBar = document.getElementById("progressBar");
-    const budgetMsg = document.getElementById("budgetMsg");
-
-    // Chart.js setup
-    const ctx = document.getElementById("pieChart").getContext("2d");
-    const pieChart = new Chart(ctx, {
-      type: "pie",
-      data: {
-        labels: [],
-        datasets: [{
-          data: [],
-          backgroundColor: ["#0088FE", "#FF8042", "#00C49F", "#FFBB28", "#E91E63"]
-        }]
-      },
-      options: {
-        responsive: false,
-        plugins: {
-          legend: { position: "bottom" }
-        }
-      }
-    });
-
-    // Save budget
-    function setBudget() {
-      budget = parseFloat(document.getElementById("budgetInput").value) || 0;
-      updateUI();
-    }
-
-    // Add expense
-    expenseForm.addEventListener("submit", function(e) {
-      e.preventDefault();
-      const formData = new FormData(expenseForm);
-      const newExpense = {
-        title: formData.get("title"),
-        amount: parseFloat(formData.get("amount")),
-        category: formData.get("category"),
-        date: formData.get("date")
-      };
-      expenses.push(newExpense);
-      expenseForm.reset();
-      updateUI();
-    });
-
-    // Update UI
-    function updateUI() {
-      // Table
-      expenseTable.innerHTML = "";
-      expenses.forEach(exp => {
-        const row = `<tr>
-          <td>${exp.title}</td>
-          <td>₹${exp.amount}</td>
-          <td>${exp.category}</td>
-          <td>${exp.date}</td>
-        </tr>`;
-        expenseTable.innerHTML += row;
-      });
-
-      // Total
-      const total = expenses.reduce((acc, exp) => acc + exp.amount, 0);
-      totalSpentEl.textContent = total.toFixed(2);
-
-      // Category totals
-      const categoryTotals = {};
-      expenses.forEach(exp => {
-        categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
-      });
-
-      // Highest category
-      const sorted = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
-      highestCategoryEl.textContent = sorted.length > 0 ? sorted[0][0] : "-";
-
-      // Progress bar
-      const percent = budget > 0 ? Math.min((total / budget) * 100, 100) : 0;
-      let color = "green";
-      if (percent >= 70 && percent < 100) color = "orange";
-      if (percent >= 100) color = "red";
-      progressBar.style.width = percent + "%";
-      progressBar.style.background = color;
-      progressBar.textContent = percent.toFixed(0) + "%";
-      budgetMsg.textContent =
-        budget > 0
-          ? total > budget
-            ? `⚠️ You exceeded your budget by ₹${(total - budget).toFixed(2)}`
-            : `Remaining Budget: ₹${(budget - total).toFixed(2)}`
-          : "Set a budget to track your spending";
-
-      // Update chart
-      pieChart.data.labels = Object.keys(categoryTotals);
-      pieChart.data.datasets[0].data = Object.values(categoryTotals);
-      pieChart.update();
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
-<script src="script.js">
-</script>
-
