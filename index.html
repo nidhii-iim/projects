@@ -7,36 +7,14 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 /* --- Realistic Animated Background --- */
-body {
-  margin:0;
-  font-family: 'Segoe UI', Tahoma, sans-serif;
-  overflow-x:hidden;
-  background: linear-gradient(135deg,#4a90e2,#50e3c2);
-  position:relative;
-}
-.bubble {
-  position:absolute;
-  border-radius:50%;
-  opacity:0.2;
-  animation:float 20s linear infinite;
-}
-@keyframes float{
-  0%{transform:translateY(100vh) translateX(0) scale(0.5);}
-  50%{transform:translateY(50vh) translateX(50vw) scale(1);}
-  100%{transform:translateY(-10vh) translateX(100vw) scale(0.5);}
-}
+body { margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; overflow-x:hidden; background: linear-gradient(135deg,#4a90e2,#50e3c2); position:relative;}
+.bubble {position:absolute; border-radius:50%; opacity:0.2; animation:float 20s linear infinite;}
+@keyframes float{0%{transform:translateY(100vh) translateX(0) scale(0.5);}50%{transform:translateY(50vh) translateX(50vw) scale(1);}100%{transform:translateY(-10vh) translateX(100vw) scale(0.5);}}
 
 /* --- Navigation --- */
-nav{
-  background: rgba(0,0,0,0.6);
-  color:white;
-  padding:15px 20px;
-  display:flex; justify-content:space-between; align-items:center;
-  position:sticky; top:0; z-index:100;
-  flex-wrap:wrap;
-}
+nav{background: rgba(0,0,0,0.6); color:white; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; flex-wrap:wrap;}
 nav h1{font-size:1.4rem;margin-bottom:5px;}
-nav ul{list-style:none;display:flex;gap:15px;flex-wrap:wrap;padding:0;margin:0;}
+nav ul{list-style:none; display:flex; gap:15px; flex-wrap:wrap; padding:0;margin:0;}
 nav ul li a{color:white;text-decoration:none;font-weight:bold;cursor:pointer;}
 nav ul li a:hover{text-decoration:underline;}
 
@@ -48,11 +26,7 @@ section.active{display:block;}
 
 /* --- Cards --- */
 .cards{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:25px;}
-.card{
-  background:white;padding:15px;border-radius:10px;
-  flex:1;min-width:180px;box-shadow:0 4px 8px rgba(0,0,0,0.2);
-  text-align:center;position:relative;transition:transform 0.3s;
-}
+.card{background:white;padding:15px;border-radius:10px; flex:1;min-width:180px;box-shadow:0 4px 8px rgba(0,0,0,0.2); text-align:center;position:relative;transition:transform 0.3s;}
 .card:hover{transform:translateY(-3px);}
 .card h3{margin-bottom:8px;color:#333;font-size:1.1rem;}
 .card p{font-size:1.2rem;font-weight:bold;margin-bottom:5px;}
@@ -60,16 +34,14 @@ section.active{display:block;}
 #progress-fill,#level-fill,#goal-fill{height:100%;width:0%;background:#4a90e2;transition:width 1s ease;}
 
 /* --- Forms --- */
-form{background:white;padding:15px;border-radius:10px;box-shadow:0 4px 8px rgba(0,0,0,0.2);
-margin-bottom:25px;display:flex;flex-wrap:wrap;gap:10px;}
+form{background:white;padding:15px;border-radius:10px;box-shadow:0 4px 8px rgba(0,0,0,0.2); margin-bottom:25px;display:flex;flex-wrap:wrap;gap:10px;}
 form input,form select{padding:10px;border:1px solid #ccc;border-radius:5px;flex:1 1 100%;font-size:1rem;}
 form button{background:#4a90e2;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;transition:all 0.3s;font-size:1rem;}
 form button:hover{background:#357ab8;transform:scale(1.05);}
 
 /* --- Lists --- */
 #expense-list,#recent-expenses{margin-top:15px;list-style:none;padding:0;}
-#expense-list li,#recent-expenses li{background:white;padding:10px 15px;margin-bottom:10px;border-radius:5px;
-display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);flex-wrap:wrap;}
+#expense-list li,#recent-expenses li{background:white;padding:10px 15px;margin-bottom:10px;border-radius:5px; display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);flex-wrap:wrap;}
 .delete-btn{background:red;color:white;border:none;border-radius:5px;padding:5px 10px;cursor:pointer;transition:all 0.3s;}
 .delete-btn:hover{transform:scale(1.1);}
 
@@ -77,12 +49,7 @@ display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4
 .chart-container{background:white;padding:15px;border-radius:10px;box-shadow:0 4px 8px rgba(0,0,0,0.2);margin-bottom:25px;overflow-x:auto;}
 
 /* --- Challenge Popup --- */
-#challenge-popup{
-  position:fixed;top:20%;left:50%;transform:translateX(-50%);
-  background:white;padding:20px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.5);
-  display:none; z-index:200; text-align:center; animation:popup 0.5s;
-  max-width:90%;
-}
+#challenge-popup{position:fixed;top:20%;left:50%;transform:translateX(-50%); background:white;padding:20px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.5); display:none; z-index:200; text-align:center; animation:popup 0.5s; max-width:90%;}
 @keyframes popup{0%{transform:translateX(-50%) scale(0);}100%{transform:translateX(-50%) scale(1);}}
 #challenge-popup button{margin-top:10px; padding:10px 20px; border:none;border-radius:5px;background:#4a90e2;color:white; cursor:pointer;}
 #challenge-popup button:hover{background:#357ab8;}
@@ -126,7 +93,6 @@ display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4
 </nav>
 
 <main>
-<!-- Dashboard -->
 <section id="dashboard" class="active">
   <h2>Dashboard</h2>
   <div class="cards">
@@ -143,7 +109,6 @@ display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4
   </div>
 </section>
 
-<!-- Add Expense -->
 <section id="add-expense">
 <h2>Add Expense</h2>
 <form id="expense-form">
@@ -171,7 +136,6 @@ display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4
 <ul id="expense-list"></ul>
 </section>
 
-<!-- Reports -->
 <section id="reports">
 <h2>Expense Reports</h2>
 <div class="chart-container"><canvas id="categoryChart"></canvas></div>
@@ -179,13 +143,11 @@ display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4
 <div class="chart-container"><canvas id="emotionChart"></canvas></div>
 </section>
 
-<!-- Emotions -->
 <section id="emotions">
 <h2>Emotion Analysis</h2>
 <p id="emotion-insight" style="font-weight:bold;"></p>
 </section>
 
-<!-- Settings -->
 <section id="settings">
 <h2>Settings</h2>
 <form id="budget-form">
@@ -197,12 +159,156 @@ display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4
 <button id="export-btn">Export CSV</button>
 </section>
 
-<!-- Challenge Popup -->
 <div id="challenge-popup"><p id="challenge-text"></p><button onclick="closeChallenge()">Close</button></div>
 
 <script>
-// --- JS code for handling expenses, dashboard, gamification, emotion tracking, charts, confetti, search ---
-// Use the JS from previous detailed code: saveData, loadData, renderExpenses, updateDashboard, updateCharts, updateEmotionAnalysis, runChallenge, closeChallenge, createConfetti, search expenses.
+// --- Data ---
+let expenses=JSON.parse(localStorage.getItem('expenses'))||[];
+let totalBudget=parseFloat(localStorage.getItem('budget'))||50000;
+let points=parseInt(localStorage.getItem('points'))||0;
+let streakDays=parseInt(localStorage.getItem('streakDays'))||0;
+let lastDate=localStorage.getItem('lastDate')||null;
+let goalAmount=parseFloat(localStorage.getItem('goalAmount'))||10000;
+
+// --- Navigation ---
+function showSection(id){
+  document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='dashboard') updateDashboard();
+  if(id==='reports') updateCharts();
+  if(id==='emotions') updateEmotionAnalysis();
+}
+
+// --- Expense Form ---
+document.getElementById('expense-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const expense={name:document.getElementById('name').value, amount:parseFloat(document.getElementById('amount').value), date:document.getElementById('date').value, category:document.getElementById('category').value, emotion:document.getElementById('emotion').value};
+  expenses.push(expense);
+  saveData();
+  renderExpenses();
+  updateDashboard();
+  updateCharts();
+  updateEmotionAnalysis();
+  runChallenge(expense);
+  e.target.reset();
+});
+
+// --- Render Expenses ---
+function renderExpenses(){
+  const list=document.getElementById('expense-list');
+  const recent=document.getElementById('recent-expenses');
+  list.innerHTML=''; recent.innerHTML='';
+  expenses.slice().reverse().forEach((e,i)=>{
+    const li=document.createElement('li');
+    li.textContent=`${e.date} | ${e.name} | ₹${e.amount} | ${e.category} | ${e.emotion}`;
+    const del=document.createElement('button'); del.className='delete-btn'; del.textContent='Delete';
+    del.onclick=()=>{expenses.splice(expenses.indexOf(e),1); saveData(); renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();}
+    li.appendChild(del);
+    list.appendChild(li);
+    if(i<5){const li2=li.cloneNode(true); li2.removeChild(li2.querySelector('button')); recent.appendChild(li2);}
+  });
+}
+
+// --- Dashboard ---
+function updateDashboard(){
+  const totalExpense=expenses.reduce((a,b)=>a+b.amount,0);
+  document.getElementById('total-budget').textContent=`₹${totalBudget}`;
+  document.getElementById('total-expense').textContent=`₹${totalExpense}`;
+  const remaining=totalBudget-totalExpense;
+  document.getElementById('remaining-budget').textContent=`₹${remaining}`;
+  document.getElementById('progress-fill').style.width=`${Math.min(100,(totalExpense/totalBudget*100))}%`;
+  // Level & badges
+  points=totalExpense/100; let level=Math.floor(points/10)+1; document.getElementById('level').textContent=level;
+  document.getElementById('level-fill').style.width=`${points*10}%`;
+  document.getElementById('badges').innerHTML=level>2?'<span class="badge">🏆</span>':'';
+  // Streak
+  const today=new Date().toISOString().split('T')[0];
+  if(lastDate===today){} else if(lastDate===new Date(new Date().setDate(new Date().getDate()-1)).toISOString().split('T')[0]){streakDays++;} else{streakDays=1;}
+  lastDate=today; document.getElementById('streak').textContent=`Streak: ${streakDays} days`;
+  // Goal
+  document.getElementById('goal-progress').textContent=`₹${totalExpense} / ₹${goalAmount}`;
+  document.getElementById('goal-fill').style.width=`${Math.min(100,(totalExpense/goalAmount*100))}%`;
+  // Top category
+  const cat={} ; expenses.forEach(e=>{cat[e.category]=(cat[e.category]||0)+e.amount;});
+  const topCat=Object.keys(cat).reduce((a,b)=>cat[a]>cat[b]?a:b,'-');
+  document.getElementById('top-category').textContent=topCat;
+}
+
+// --- Charts ---
+let categoryChart, monthlyChart, emotionChart;
+function updateCharts(){
+  const categories={}, months={}, emotions={};
+  expenses.forEach(e=>{
+    categories[e.category]=(categories[e.category]||0)+e.amount;
+    months[e.date.substring(0,7)] = (months[e.date.substring(0,7)]||0)+e.amount;
+    emotions[e.emotion]=(emotions[e.emotion]||0)+e.amount;
+  });
+  const ctx1=document.getElementById('categoryChart').getContext('2d');
+  if(categoryChart) categoryChart.destroy();
+  categoryChart=new Chart(ctx1,{type:'pie',data:{labels:Object.keys(categories),datasets:[{data:Object.values(categories),backgroundColor:['#4a90e2','#f5a623','#7ed321','#d0021b']}]},options:{animation:{duration:1000}}});
+  const ctx2=document.getElementById('monthlyChart').getContext('2d');
+  if(monthlyChart) monthlyChart.destroy();
+  monthlyChart=new Chart(ctx2,{type:'bar',data:{labels:Object.keys(months),datasets:[{label:'Expenses',data:Object.values(months),backgroundColor:'#4a90e2'}]},options:{animation:{duration:1000}}});
+  const ctx3=document.getElementById('emotionChart').getContext('2d');
+  if(emotionChart) emotionChart.destroy();
+  emotionChart=new Chart(ctx3,{type:'pie',data:{labels:Object.keys(emotions),datasets:[{data:Object.values(emotions),backgroundColor:['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db']}]},options:{animation:{duration:1000}}});
+}
+
+// --- Emotion Analysis ---
+function updateEmotionAnalysis(){
+  if(expenses.length===0){ document.getElementById('emotion-insight').textContent='No data yet.'; return; }
+  const emotionTotals={};
+  expenses.forEach(e=>emotionTotals[e.emotion]=(emotionTotals[e.emotion]||0)+e.amount);
+  const maxEmotion=Object.keys(emotionTotals).reduce((a,b)=>emotionTotals[a]>emotionTotals[b]?a:b);
+  document.getElementById('emotion-insight').textContent=`💡 You tend to spend most when you feel ${maxEmotion}.`;
+}
+
+// --- Mini Challenges ---
+function runChallenge(expense){
+  const popup=document.getElementById('challenge-popup');
+  const text=document.getElementById('challenge-text');
+  if(expense.emotion==='Stressed' && expense.amount>500){
+    text.textContent="⚠️ You spent a lot while stressed! Try to keep under ₹500 today."; popup.style.display='block'; createConfetti();
+  } else if(expense.emotion==='Excited' && expense.amount>1000){
+    text.textContent="🎉 Big spend while excited! Consider saving some."; popup.style.display='block'; createConfetti();}
+}
+function closeChallenge(){document.getElementById('challenge-popup').style.display='none';}
+
+// --- Confetti ---
+function createConfetti(){for(let i=0;i<30;i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*window.innerWidth+'px';c.style.background=['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db'][Math.floor(Math.random()*5)];document.body.appendChild(c);setTimeout(()=>c.remove(),3000);}}
+
+// --- Save & Load ---
+function saveData(){
+  localStorage.setItem('expenses',JSON.stringify(expenses));
+  localStorage.setItem('budget',totalBudget);
+  localStorage.setItem('points',points);
+  localStorage.setItem('streakDays',streakDays);
+  localStorage.setItem('lastDate',lastDate);
+  localStorage.setItem('goalAmount',goalAmount);
+}
+
+// --- Budget Form ---
+document.getElementById('budget-form').addEventListener('submit',e=>{e.preventDefault(); totalBudget=parseFloat(document.getElementById('new-budget').value); goalAmount=parseFloat(document.getElementById('goal-amount').value); saveData(); updateDashboard(); e.target.reset();});
+
+// --- Reset Data ---
+document.getElementById('reset-btn').addEventListener('click',()=>{if(confirm('Reset all data?')){expenses=[];totalBudget=50000;points=0;streakDays=0;goalAmount=10000;lastDate=null;saveData(); renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();}});
+
+// --- CSV Export ---
+document.getElementById('export-btn').addEventListener('click',()=>{
+  let csv='Date,Name,Amount,Category,Emotion\n';
+  expenses.forEach(e=>{csv+=`${e.date},${e.name},${e.amount},${e.category},${e.emotion}\n`});
+  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='expenses.csv'; a.click(); URL.revokeObjectURL(url);
+});
+
+// --- Search Expenses ---
+document.getElementById('search-expense').addEventListener('input',e=>{
+  const query=e.target.value.toLowerCase();
+  document.querySelectorAll('#expense-list li').forEach(li=>{li.style.display=li.textContent.toLowerCase().includes(query)?'flex':'none';});
+});
+
+// --- Initial Render ---
+renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();
 </script>
 </body>
 </html>
