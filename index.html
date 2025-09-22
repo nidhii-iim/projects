@@ -1,354 +1,457 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Expense Tracker</title>
-  <style>
-    body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f5f5f5;
-    color: #333;
-    transition: background 0.3s, color 0.3s;
-  }
-  
-  header {
-    background-color: #4CAF50;
-    color: white;
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  
-  header h1 i {
-    margin-right: 0.5rem;
-  }
-  
-  nav {
-    background-color: #333;
-    display: flex;
-    flex-wrap: wrap;
-  }
-  
-  nav button {
-    flex: 1;
-    padding: 1rem;
-    color: white;
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  nav button:hover {
-    background-color: #555;
-  }
-  
-  .page {
-    display: none;
-    padding: 1rem;
-  }
-  
-  .cards {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-  }
-  
-  .card {
-    background-color: #eee;
-    padding: 1rem;
-    border-radius: 12px;
-    flex: 1;
-    min-width: 140px;
-    text-align: center;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    transition: transform 0.3s;
-  }
-  
-  .card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .card.income { background-color: #d4edda; color: #155724; }
-  .card.expense { background-color: #f8d7da; color: #721c24; }
-  .card.savings { background-color: #fff3cd; color: #856404; }
-  
-  form input, form select, form button, label {
-    display: block;
-    margin: 0.5rem 0;
-    padding: 0.5rem;
-    width: 100%;
-  }
-  
-  button {
-    cursor: pointer;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    transition: background 0.3s;
-  }
-  
-  button:hover {
-    background-color: #45a049;
-  }
-  
-  .dark-mode {
-    background-color: #121212;
-    color: white;
-  }
-  
-  .dark-mode header {
-    background-color: #1e1e1e;
-  }
-  
-  .dark-mode nav button {
-    color: white;
-  }
-  
-  .dark-mode .card.income { background-color: #1b4332; color: #d4edda; }
-  .dark-mode .card.expense { background-color: #611a15; color: #f8d7da; }
-  .dark-mode .card.savings { background-color: #664d03; color: #fff3cd; }
-  
-  @media (max-width: 600px) {
-    nav button { flex: 100%; }
-    .cards { flex-direction: column; }
-  }
-  </style>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Gamified Budget & Emotion Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* --- Realistic Background --- */
+body {
+  margin:0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background: linear-gradient(135deg,#4a90e2,#50e3c2);
+  overflow-x:hidden;
+  position:relative;
+}
+.float-shape{
+  position:absolute;
+  width:50px; height:50px;
+  background: rgba(255,255,255,0.1);
+  border-radius:50%;
+  animation: float 20s linear infinite;
+}
+@keyframes float{
+  0%{transform:translateY(100vh) translateX(0);}
+  100%{transform:translateY(-10vh) translateX(100vw);}
+}
+/* --- Navigation --- */
+nav{
+  background: rgba(0,0,0,0.6);
+  color:white;
+  padding:15px 20px;
+  display:flex; justify-content:space-between; align-items:center;
+  position:sticky; top:0; z-index:100;
+  border-bottom:1px solid white;
+}
+nav h1{font-size:1.5rem;}
+nav ul{list-style:none;display:flex;gap:15px;}
+nav ul li a{color:white;text-decoration:none;font-weight:bold;cursor:pointer;}
+nav ul li a:hover{text-decoration:underline;}
+/* --- Sections --- */
+main{max-width:1000px;margin:20px auto;padding:0 20px; position:relative; z-index:1;}
+section{display:none;animation:fadeIn 0.5s;}
+section.active{display:block;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+/* --- Cards --- */
+.cards{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:30px;}
+.card{
+  background:white;padding:20px;border-radius:10px;
+  flex:1;min-width:200px;box-shadow:0 4px 8px rgba(0,0,0,0.2);
+  text-align:center;position:relative;transition:transform 0.3s;
+}
+.card:hover{transform:translateY(-5px);}
+.card h3{margin-bottom:10px;color:#333;}
+.card p{font-size:1.5rem;font-weight:bold;margin-bottom:10px;}
+.progress-bar{height:15px;background:#ddd;border-radius:10px;overflow:hidden;margin-top:5px;}
+#progress-fill,#level-fill,#goal-fill{height:100%;width:0%;background:#4a90e2;transition:width 1s ease;}
+/* --- Forms --- */
+form{background:white;padding:20px;border-radius:10px;box-shadow:0 4px 8px rgba(0,0,0,0.2);
+margin-bottom:30px;display:flex;flex-wrap:wrap;gap:15px;}
+form input,form select{padding:10px;border:1px solid #ccc;border-radius:5px;flex:1;min-width:120px;}
+form button{background:#4a90e2;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;transition:all 0.3s;}
+form button:hover{background:#357ab8;transform:scale(1.05);}
+/* --- Lists --- */
+#expense-list,#recent-expenses{margin-top:20px;list-style:none;}
+#expense-list li,#recent-expenses li{background:white;padding:10px 15px;margin-bottom:10px;border-radius:5px;
+display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);}
+.delete-btn{background:red;color:white;border:none;border-radius:5px;padding:5px 10px;cursor:pointer;transition:all 0.3s;}
+.delete-btn:hover{transform:scale(1.1);}
+.chart-container{background:white;padding:20px;border-radius:10px;box-shadow:0 4px 8px rgba(0,0,0,0.2);margin-bottom:30px;}
+button#reset-btn{background:#d0021b;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;margin-top:10px;transition:all 0.3s;}
+button#reset-btn:hover{background:#a30016;transform:scale(1.05);}
+.badge{display:inline-block;background:#f5a623;color:white;padding:5px 10px;border-radius:5px;margin-top:10px;animation:pop 0.6s;}
+@keyframes pop{0%{transform:scale(0);}60%{transform:scale(1.3);}100%{transform:scale(1);}}
+.confetti{position:absolute;width:10px;height:10px;background:orange;opacity:0.7;animation:fall linear forwards;}
+@keyframes fall{0%{transform:translateY(0) rotate(0deg);}100%{transform:translateY(500px) rotate(360deg);opacity:0;}}
+.streak{color:#e67e22;font-weight:bold;animation:glow 1s infinite alternate;}
+@keyframes glow{0%{text-shadow:0 0 5px #e67e22;}100%{text-shadow:0 0 20px #f39c12;}}
+/* --- Challenge Popup --- */
+#challenge-popup{
+  position:fixed;top:20%;left:50%;transform:translateX(-50%);
+  background:white;padding:20px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.5);
+  display:none; z-index:200; text-align:center; animation:popup 0.5s;
+}
+@keyframes popup{0%{transform:translateX(-50%) scale(0);}100%{transform:translateX(-50%) scale(1);}}
+#challenge-popup button{margin-top:10px; padding:10px 20px; border:none;border-radius:5px;background:#4a90e2;color:white; cursor:pointer;}
+#challenge-popup button:hover{background:#357ab8;}
+</style>
 </head>
 <body>
-  <header>
-    <h1><i class="fa-solid fa-wallet"></i>  Expense Tracker</h1>
-    <button id="toggleTheme"><i class="fa-solid fa-moon"></i></button>
-  </header>
 
-  <nav>
-    <button onclick="showPage('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
-    <button onclick="showPage('addIncome')"><i class="fa-solid fa-arrow-down"></i> Add Income</button>
-    <button onclick="showPage('addExpense')"><i class="fa-solid fa-arrow-up"></i> Add Expense</button>
-    <button onclick="showPage('reports')"><i class="fa-solid fa-table"></i> Reports</button>
-  </nav>
+<!-- Floating shapes for background -->
+<div class="float-shape" style="left:10%; width:40px;height:40px;"></div>
+<div class="float-shape" style="left:40%; width:60px;height:60px;"></div>
+<div class="float-shape" style="left:70%; width:50px;height:50px;"></div>
 
-  <main>
+<!-- Navigation -->
+<nav>
+    <h1>Advanced Budget Tracker</h1>
+    <ul>
+        <li><a onclick="showSection('dashboard')">Dashboard</a></li>
+        <li><a onclick="showSection('add-expense')">Add Expense</a></li>
+        <li><a onclick="showSection('reports')">Reports</a></li>
+        <li><a onclick="showSection('emotions')">Emotions</a></li>
+        <li><a onclick="showSection('settings')">Settings</a></li>
+    </ul>
+</nav>
+
+<main>
     <!-- Dashboard -->
-    <section id="dashboard" class="page">
-      <h2>Dashboard</h2>
-      <div class="cards">
-        <div class="card income"><i class="fa-solid fa-money-bill-wave"></i> Total Income: ₹<span id="totalIncome">0</span></div>
-        <div class="card expense"><i class="fa-solid fa-credit-card"></i> Total Expenses: ₹<span id="totalExpenses">0</span></div>
-        <div class="card savings"><i class="fa-solid fa-coins"></i> Savings: ₹<span id="savings">0</span></div>
-      </div>
-      <div>
-        <label for="monthFilter">Filter Month: </label>
-        <input type="month" id="monthFilter">
-      </div>
-      <h3>Recent Transactions</h3>
-      <ul id="recentTransactions" class="animate__animated animate__fadeIn"></ul>
-    </section>
-
-    <!-- Add Income -->
-    <section id="addIncome" class="page">
-      <h2>Add Income</h2>
-      <form id="incomeForm">
-        <input type="number" id="incomeAmount" placeholder="Amount" required>
-        <input type="text" id="incomeSource" placeholder="Source (Salary, Gift, etc.)" required>
-        <input type="date" id="incomeDate" required>
-        <button type="submit"><i class="fa-solid fa-plus"></i> Add Income</button>
-      </form>
+    <section id="dashboard" class="active">
+        <h2>Dashboard</h2>
+        <div class="cards">
+            <div class="card">
+                <h3>Total Budget</h3>
+                <p id="total-budget">₹0</p>
+            </div>
+            <div class="card">
+                <h3>Total Expense</h3>
+                <p id="total-expense">₹0</p>
+            </div>
+            <div class="card">
+                <h3>Remaining</h3>
+                <p id="remaining-budget">₹0</p>
+                <div class="progress-bar"><div id="progress-fill"></div></div>
+            </div>
+            <div class="card">
+                <h3>Level: <span id="level">1</span></h3>
+                <div class="progress-bar"><div id="level-fill"></div></div>
+                <div id="badges"></div>
+                <p id="streak" class="streak"></p>
+            </div>
+        </div>
+        <h3>Recent Expenses</h3>
+        <ul id="recent-expenses"></ul>
+        <div class="cards">
+          <div class="card">
+            <h3>Savings Goal</h3>
+            <p id="goal-progress">₹0 / ₹0</p>
+            <div class="progress-bar"><div id="goal-fill"></div></div>
+          </div>
+          <div class="card">
+            <h3>Top Category</h3>
+            <p id="top-category">-</p>
+          </div>
+        </div>
     </section>
 
     <!-- Add Expense -->
-    <section id="addExpense" class="page">
-      <h2>Add Expense</h2>
-      <form id="expenseForm">
-        <input type="number" id="expenseAmount" placeholder="Amount" required>
-        <input type="text" id="expenseCategory" placeholder="Category (Food, Transport, etc.)" required>
-        <input type="text" id="expenseTag" placeholder="Tag (optional)">
-        <input type="date" id="expenseDate" required>
-        <label><input type="checkbox" id="expenseRecurring"> Recurring Monthly</label>
-        <button type="submit"><i class="fa-solid fa-plus"></i> Add Expense</button>
-      </form>
+    <section id="add-expense">
+        <h2>Add New Expense</h2>
+        <form id="expense-form">
+            <input type="text" id="name" placeholder="Expense Name" required>
+            <input type="number" id="amount" placeholder="Amount (₹)" required>
+            <input type="date" id="date" required>
+            <select id="category" required>
+                <option value="">Select Category</option>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Others">Others</option>
+            </select>
+            <select id="emotion" required>
+                <option value="">How are you feeling?</option>
+                <option value="Happy">😊 Happy</option>
+                <option value="Sad">😢 Sad</option>
+                <option value="Stressed">😫 Stressed</option>
+                <option value="Excited">🤩 Excited</option>
+                <option value="Angry">😡 Angry</option>
+            </select>
+            <button type="submit">Add Expense</button>
+        </form>
+        <ul id="expense-list"></ul>
+        <input type="text" id="search-expense" placeholder="Search Expenses..." style="width:100%;padding:10px;margin-top:10px;">
     </section>
 
     <!-- Reports -->
-    <section id="reports" class="page">
-      <h2>Reports</h2>
-      <canvas id="expenseChart" width="400" height="200"></canvas>
-      <button onclick="exportCSV()"><i class="fa-solid fa-download"></i> Export CSV</button>
+    <section id="reports">
+        <h2>Expense Reports</h2>
+        <div class="chart-container">
+            <canvas id="categoryChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="monthlyChart"></canvas>
+        </div>
     </section>
-  </main>
+
+    <!-- Emotions Analysis -->
+    <section id="emotions">
+        <h2>Emotion Spending Analysis</h2>
+        <div class="chart-container">
+            <canvas id="emotionChart"></canvas>
+        </div>
+        <p id="emotion-insight" style="font-weight:bold;"></p>
+    </section>
+
+    <!-- Settings -->
+    <section id="settings">
+        <h2>Settings</h2>
+        <form id="budget-form">
+            <input type="number" id="new-budget" placeholder="Set Total Budget (₹)" required>
+            <input type="number" id="goal-amount" placeholder="Set Savings Goal (₹)" required>
+            <button type="submit">Save Budget & Goal</button>
+        </form>
+        <button id="reset-btn">Reset All Data</button>
+        <button id="export-btn">Export CSV</button>
+    </section>
+</main>
+
+<!-- Challenge Popup -->
+<div id="challenge-popup">
+  <p id="challenge-text"></p>
+  <button onclick="closeChallenge()">Close</button>
+</div>
 
 <script>
-  // Page navigation
-  function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-    document.getElementById(pageId).style.display = 'block';
-  }
-  showPage('dashboard'); // default
+// --- Data ---
+let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+let totalBudget = parseInt(localStorage.getItem('budget')) || 50000;
+let points = parseInt(localStorage.getItem('points')) || 0;
+let streakDays = parseInt(localStorage.getItem('streakDays')) || 0;
+let lastDate = localStorage.getItem('lastDate') || null;
+let goalAmount = parseInt(localStorage.getItem('goalAmount')) || 10000;
 
-  // Theme toggle
-  const toggleThemeBtn = document.getElementById('toggleTheme');
-  toggleThemeBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-  });
-
-  // Local Storage setup
-  let incomes = JSON.parse(localStorage.getItem('incomes')) || [];
-  let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-  let recurringExpenses = JSON.parse(localStorage.getItem('recurringExpenses')) || [];
-
-  // Add Income
-  document.getElementById('incomeForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const amount = parseFloat(document.getElementById('incomeAmount').value);
-    const source = document.getElementById('incomeSource').value;
-    const date = document.getElementById('incomeDate').value;
-    incomes.push({ amount, source, date });
-    localStorage.setItem('incomes', JSON.stringify(incomes));
-    e.target.reset();
+// --- Navigation ---
+function showSection(id){
+    document.querySelectorAll('section').forEach(sec=>sec.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
     updateDashboard();
-    Swal.fire('Success!', 'Income Added!', 'success');
-  });
+    updateCharts();
+    renderExpenses();
+    if(id==='emotions') updateEmotionAnalysis();
+}
 
-  // Add Expense
-  document.getElementById('expenseForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const amount = parseFloat(document.getElementById('expenseAmount').value);
-    const category = document.getElementById('expenseCategory').value;
-    const tag = document.getElementById('expenseTag').value;
-    const date = document.getElementById('expenseDate').value;
-    const recurring = document.getElementById('expenseRecurring').checked;
+// --- Gamification ---
+function calculatePoints(amount){ return Math.floor(amount/100); }
+function getLevel(){ return Math.floor(points/10)+1; }
+function getBadges(){
+    const badges = [];
+    if(points>=20) badges.push('Saver Badge 🏆');
+    if(points>=50) badges.push('Budget Master 🏅');
+    if(points>=100) badges.push('Finance Guru 🏆');
+    return badges;
+}
 
-    expenses.push({ amount, category, tag, date });
-    if (recurring) {
-      recurringExpenses.push({ amount, category, tag, startDate: date });
-      localStorage.setItem('recurringExpenses', JSON.stringify(recurringExpenses));
-    }
-    localStorage.setItem('expenses', JSON.stringify(expenses));
-    e.target.reset();
-    updateDashboard();
-    renderChart();
-    Swal.fire('Success!', 'Expense Added!', 'success');
-  });
-
-  // Recurring Expenses
-  function applyRecurringExpenses() {
+// --- Streak ---
+function updateStreak(){
     const today = new Date().toISOString().split('T')[0];
-    recurringExpenses.forEach(r => {
-      const lastAdded = expenses.find(e => e.category === r.category && e.date === today);
-      if (!lastAdded) expenses.push({ amount: r.amount, category: r.category, tag: r.tag, date: today });
-    });
-    localStorage.setItem('expenses', JSON.stringify(expenses));
-  }
-  applyRecurringExpenses();
-
-  // Dashboard
-  function updateDashboard() {
-    const totalIncome = incomes.reduce((a, b) => a + b.amount, 0);
-    const totalExpenses = expenses.reduce((a, b) => a + b.amount, 0);
-    const savings = totalIncome - totalExpenses;
-    document.getElementById('totalIncome').textContent = totalIncome.toFixed(2);
-    document.getElementById('totalExpenses').textContent = totalExpenses.toFixed(2);
-    document.getElementById('savings').textContent = savings.toFixed(2);
-
-    // Fix: sort before mapping
-    const recent = [
-      ...incomes.map(i => ({ type: 'Income', amount: i.amount, category: i.source, date: i.date })),
-      ...expenses.map(e => ({ type: 'Expense', amount: e.amount, category: e.category, date: e.date }))
-    ]
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-      .slice(0, 5)
-      .map(r => `${r.type}: ₹${r.amount} (${r.category}) on ${r.date}`);
-
-    document.getElementById('recentTransactions').innerHTML = recent.map(r => `<li>${r}</li>`).join('');
-
-    // Fun badge
-    if (savings >= 1000) {
-      Swal.fire('🎉 Great Job!', `You saved ₹${savings.toFixed(2)} this month!`, 'success');
+    if(lastDate === today){}
+    else{
+        const yesterday = new Date(Date.now()-86400000).toISOString().split('T')[0];
+        if(lastDate===yesterday) streakDays++;
+        else streakDays=1;
+        lastDate=today;
+        localStorage.setItem('lastDate',lastDate);
+        localStorage.setItem('streakDays',streakDays);
     }
-  }
+}
 
-  // Chart
-  function renderChart(filterMonth = null) {
-    const ctx = document.getElementById('expenseChart').getContext('2d');
-    let filteredExpenses = expenses;
-    if (filterMonth) filteredExpenses = expenses.filter(e => e.date.startsWith(filterMonth));
+// --- Dashboard ---
+function updateDashboard(){
+    updateStreak();
+    let totalExpense = expenses.reduce((sum,e)=>sum+e.amount,0);
+    let remaining = totalBudget - totalExpense;
+    document.getElementById('total-budget').textContent=`₹${totalBudget}`;
+    document.getElementById('total-expense').textContent=`₹${totalExpense}`;
+    document.getElementById('remaining-budget').textContent=`₹${remaining}`;
+    document.getElementById('goal-progress').textContent=`₹${totalExpense} / ₹${goalAmount}`;
+    document.getElementById('progress-fill').style.width=Math.min((totalExpense/totalBudget)*100,100)+'%';
+    document.getElementById('goal-fill').style.width=Math.min((totalExpense/goalAmount)*100,100)+'%';
+    document.getElementById('level').textContent=getLevel();
+    document.getElementById('level-fill').style.width=Math.min((points%10)*10,100)+'%';
 
-    const categories = [...new Set(filteredExpenses.map(e => e.category))];
-    const amounts = categories.map(c =>
-      filteredExpenses.filter(e => e.category === c).reduce((a, b) => a + b.amount, 0)
-    );
-
-    const fixedColors = [
-      '#FF6384', '#36A2EB', '#FFCE56',
-      '#4BC0C0', '#9966FF', '#FF9F40',
-      '#8DFF33', '#FF33F6', '#33FFF5'
-    ];
-
-    if (window.expenseChart) window.expenseChart.destroy();
-    window.expenseChart = new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: categories,
-        datasets: [{
-          data: amounts,
-          backgroundColor: categories.map((c, i) => fixedColors[i % fixedColors.length])
-        }]
-      },
-      options: {
-        responsive: true,
-        onClick: (evt, item) => {
-          if (item.length > 0) {
-            const idx = item[0].index;
-            const cat = categories[idx];
-            const trans = expenses
-              .filter(e => e.category === cat)
-              .map(e => `₹${e.amount} on ${e.date} [${e.tag || 'No Tag'}]`)
-              .join('<br>');
-            Swal.fire({ title: `${cat} Transactions`, html: trans, icon: 'info' });
-          }
-        }
-      }
+    const badgesEl=document.getElementById('badges');
+    badgesEl.innerHTML='';
+    getBadges().forEach(b=>{
+        const span=document.createElement('span'); 
+        span.className='badge'; span.textContent=b;
+        badgesEl.appendChild(span);
+        createConfetti();
     });
-  }
+    document.getElementById('streak').textContent=`🔥 Streak: ${streakDays} days`;
 
-  // Month filter
-  document.getElementById('monthFilter').addEventListener('change', e => renderChart(e.target.value));
+    const recent=document.getElementById('recent-expenses');
+    if(recent){
+        recent.innerHTML='';
+        expenses.slice(-5).reverse().forEach(e=>{
+            const li=document.createElement('li');
+            li.textContent=`${e.date} - ${e.name} - ₹${e.amount} (${e.category}) [${e.emotion}]`;
+            recent.appendChild(li);
+        });
+    }
 
-  // Export CSV
-  function exportCSV() {
-    let csv = 'Type,Amount,Category/Source,Tag,Date\n';
-    incomes.forEach(i => csv += `Income,${i.amount},${i.source},,${i.date}\n`);
-    expenses.forEach(e => csv += `Expense,${e.amount},${e.category},${e.tag},${e.date}\n`);
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'expenses.csv';
-    link.click();
-  }
+    // Top Category
+    let categoryTotals={};
+    expenses.forEach(e=>categoryTotals[e.category]=(categoryTotals[e.category]||0)+e.amount);
+    let topCat=Object.keys(categoryTotals).reduce((a,b)=>categoryTotals[a]>categoryTotals[b]?a:b,'-');
+    document.getElementById('top-category').textContent=topCat;
 
-  // Initialize
-  updateDashboard();
-  renderChart();
+    // Mini Challenge
+    if(expenses.length>0) runChallenge(expenses[expenses.length-1]);
+}
+
+// --- Expenses ---
+function renderExpenses(){
+    const list=document.getElementById('expense-list');
+    if(list){
+        list.innerHTML='';
+        expenses.forEach((e,index)=>{
+            const li=document.createElement('li');
+            li.innerHTML=`${e.date} - ${e.name} - ₹${e.amount} (${e.category}) [${e.emotion}]
+            <button class="delete-btn" onclick="deleteExpense(${index})">Delete</button>`;
+            list.appendChild(li);
+        });
+    }
+}
+function deleteExpense(index){
+    points -= calculatePoints(expenses[index].amount);
+    expenses.splice(index,1);
+    saveData();
+    renderExpenses();
+    updateDashboard();
+    updateCharts();
+}
+
+// --- Form Submit ---
+document.getElementById('expense-form').addEventListener('submit', e=>{
+    e.preventDefault();
+    const name=document.getElementById('name').value;
+    const amount=parseInt(document.getElementById('amount').value);
+    const category=document.getElementById('category').value;
+    const date=document.getElementById('date').value;
+    const emotion=document.getElementById('emotion').value;
+    expenses.push({name,amount,category,date,emotion});
+    points+=calculatePoints(amount);
+    saveData();
+    e.target.reset();
+    renderExpenses();
+    updateDashboard();
+    updateCharts();
+});
+
+// --- Budget & Goal Form ---
+document.getElementById('budget-form').addEventListener('submit', e=>{
+    e.preventDefault();
+    totalBudget=parseInt(document.getElementById('new-budget').value);
+    goalAmount=parseInt(document.getElementById('goal-amount').value);
+    localStorage.setItem('goalAmount',goalAmount);
+    saveData();
+    updateDashboard();
+    e.target.reset();
+});
+
+// --- Reset & Export ---
+document.getElementById('reset-btn').addEventListener('click',()=>{
+    if(confirm('Are you sure?')){
+        expenses=[]; totalBudget=50000; points=0; streakDays=0; lastDate=null; goalAmount=10000;
+        localStorage.removeItem('goalAmount');
+        saveData();
+        updateDashboard();
+        renderExpenses();
+        updateCharts();
+    }
+});
+document.getElementById('export-btn').addEventListener('click',()=>{
+    let csv="Date,Name,Amount,Category,Emotion\n";
+    expenses.forEach(e=>{csv+=`${e.date},${e.name},${e.amount},${e.category},${e.emotion}\n`;});
+    let blob=new Blob([csv],{type:"text/csv"});
+    let url=URL.createObjectURL(blob);
+    let a=document.createElement('a'); a.href=url; a.download="expenses.csv"; a.click();
+});
+
+// --- Charts ---
+let categoryChart, monthlyChart, emotionChart;
+function updateCharts(){
+    const categories={}; const months={}; const emotions={};
+    expenses.forEach(e=>{
+        categories[e.category]=(categories[e.category]||0)+e.amount;
+        months[e.date.substring(0,7)] = (months[e.date.substring(0,7)]||0)+e.amount;
+        emotions[e.emotion]=(emotions[e.emotion]||0)+e.amount;
+    });
+    const ctx1=document.getElementById('categoryChart').getContext('2d');
+    if(categoryChart) categoryChart.destroy();
+    categoryChart=new Chart(ctx1,{type:'pie',data:{labels:Object.keys(categories),datasets:[{data:Object.values(categories),backgroundColor:['#4a90e2','#f5a623','#7ed321','#d0021b']}]},options:{animation:{duration:1000}}});
+    const ctx2=document.getElementById('monthlyChart').getContext('2d');
+    if(monthlyChart) monthlyChart.destroy();
+    monthlyChart=new Chart(ctx2,{type:'bar',data:{labels:Object.keys(months),datasets:[{label:'Expenses',data:Object.values(months),backgroundColor:'#4a90e2'}]},options:{animation:{duration:1000}}});
+    const ctx3=document.getElementById('emotionChart').getContext('2d');
+    if(emotionChart) emotionChart.destroy();
+    emotionChart=new Chart(ctx3,{type:'pie',data:{labels:Object.keys(emotions),datasets:[{data:Object.values(emotions),backgroundColor:['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db']}]},options:{animation:{duration:1000}}});
+}
+
+// --- Emotion Analysis ---
+function updateEmotionAnalysis(){
+    if(expenses.length===0){ document.getElementById('emotion-insight').textContent='No data yet.'; return; }
+    const emotionTotals={};
+    expenses.forEach(e=>emotionTotals[e.emotion]=(emotionTotals[e.emotion]||0)+e.amount);
+    const maxEmotion=Object.keys(emotionTotals).reduce((a,b)=>emotionTotals[a]>emotionTotals[b]?a:b);
+    document.getElementById('emotion-insight').textContent=`💡 You tend to spend most when you feel ${maxEmotion}.`;
+}
+
+// --- Confetti ---
+function createConfetti(){
+    for(let i=0;i<30;i++){
+        const conf=document.createElement('div');
+        conf.className='confetti';
+        conf.style.left=Math.random()*100+'%';
+        conf.style.background=`hsl(${Math.random()*360},100%,50%)`;
+        conf.style.animationDuration=(Math.random()*2+1)+'s';
+        document.body.appendChild(conf);
+        setTimeout(()=>conf.remove(),2000);
+    }
+}
+
+// --- Mini Challenges ---
+function runChallenge(expense){
+    const popup=document.getElementById('challenge-popup');
+    const text=document.getElementById('challenge-text');
+    if(expense.emotion==='Stressed' && expense.amount>500){
+        text.textContent="⚠️ You spent a lot while stressed! Try to keep under ₹500 today.";
+        popup.style.display='block';
+        createConfetti();
+    } else if(expense.emotion==='Happy' && expense.amount<100){
+        text.textContent="🎉 Great! You spent wisely while happy!";
+        popup.style.display='block';
+        createConfetti();
+    }
+}
+function closeChallenge(){document.getElementById('challenge-popup').style.display='none';}
+
+// --- Search ---
+document.getElementById('search-expense').addEventListener('input', e=>{
+    const term=e.target.value.toLowerCase();
+    document.querySelectorAll('#expense-list li').forEach(li=>{
+        li.style.display=li.textContent.toLowerCase().includes(term)?'flex':'none';
+    });
+});
+
+// --- Save Data ---
+function saveData(){
+    localStorage.setItem('expenses',JSON.stringify(expenses));
+    localStorage.setItem('budget',totalBudget);
+    localStorage.setItem('points',points);
+    localStorage.setItem('streakDays',streakDays);
+    localStorage.setItem('lastDate',lastDate);
+    localStorage.setItem('goalAmount',goalAmount);
+}
+
+// --- Initialize ---
+showSection('dashboard');
+updateCharts();
+renderExpenses();
+updateDashboard();
+updateEmotionAnalysis();
 </script>
-
 </body>
 </html>
-
-
-
-
