@@ -3,261 +3,245 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premium Mobile Budget Tracker</title>
+<title>Budget & Emotion Tracker with Gamification</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg1: #0f1724;
-    --accent1: #4a90e2;
-    --accent2: #50e3c2;
-    --glass: rgba(255,255,255,0.08);
-    --glass-strong: rgba(255,255,255,0.14);
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;height:100%;font-family:"Inter",sans-serif;color:#fff;background:linear-gradient(120deg,var(--bg1) 0%,#122233 60%,#0b2233 100%);}
-  .app{max-width:980px;margin:0 auto;padding:16px;position:relative;z-index:1;}
-  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-  .brand{display:flex;align-items:center;gap:12px;}
-  .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#062433;box-shadow:0 6px 18px rgba(0,0,0,0.4);}
-  h1{margin:0;font-size:1.05rem;}
-  nav a{padding:8px 12px;border-radius:12px;text-decoration:none;color:rgba(255,255,255,0.9);font-weight:600;cursor:pointer;}
-  nav a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#052a34;box-shadow:0 8px 26px rgba(74,144,226,0.14);}
-  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px;}
-  .card{background:var(--glass);border-radius:14px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,0.45);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.03);transition:transform .22s,box-shadow .22s;}
-  .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,23,0.6);}
-  .card h3{margin:0;font-size:0.9rem;font-weight:600;color:#e6f7ff;}
-  .card .value{font-weight:700;font-size:1.15rem;margin-top:6px;color:#fff;}
-  .progress{height:10px;background:rgba(255,255,255,0.06);border-radius:999px;margin-top:8px;overflow:hidden;}
-  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .8s ease;}
-  section{display:none;margin-top:12px;}
-  section.active{display:block;}
-  .panel{background:var(--glass-strong);border-radius:14px;padding:12px;box-shadow:0 12px 28px rgba(2,6,23,0.45);border:1px solid rgba(255,255,255,0.04);}
-  ul.expense-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;}
-  li.expense{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border-radius:10px;background:rgba(0,0,0,0.16);border:1px solid rgba(255,255,255,0.03);}
-  .row{display:flex;gap:8px;}
-  .row .half{flex:1;}
-  input, select, button{font-family:"Inter",sans-serif;}
-  input[type=text],input[type=number],input[type=date],select{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.12);color:#fff;font-size:14px;}
-  button.primary{padding:12px 16px;border-radius:999px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#062433;font-weight:700;cursor:pointer;}
-  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#fff;padding:10px 12px;border-radius:10px;cursor:pointer;}
-  .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .chart-wrap{border-radius:12px;overflow:hidden;min-height:240px;}
-  @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr;}}
-  @media(max-width:520px){.cards{grid-template-columns:1fr}.chart-wrap{min-width:320px;}}
+body {margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#74ebd5,#9face6);color:#333;overflow-x:hidden;}
+nav {display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#222;color:#fff;position:sticky;top:0;z-index:100;}
+nav ul {display:flex;list-style:none;gap:15px;}
+nav ul li a {color:#fff;text-decoration:none;cursor:pointer;}
+main {max-width:1000px;margin:20px auto;padding:0 15px;}
+section {display:none;}
+section.active {display:block;}
+.card {background:rgba(255,255,255,0.8);padding:15px;margin:10px 0;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+form input,form select,form button{display:block;width:100%;margin:8px 0;padding:10px;border:none;border-radius:8px;}
+form button{background:#ff9800;color:white;font-weight:bold;cursor:pointer;}
+#expense-list li,#recent-expenses li{background:rgba(255,255,255,0.8);margin:5px 0;padding:10px;border-radius:8px;display:flex;justify-content:space-between;flex-wrap:wrap;}
+.delete-btn{background:red;color:#fff;border:none;padding:5px 10px;border-radius:5px;}
+.chart-container{background:rgba(255,255,255,0.8);padding:10px;border-radius:10px;margin:10px 0;}
+canvas{max-width:100%;height:300px !important;}
+.badge{display:inline-block;background:#ffd700;color:#000;padding:5px 10px;border-radius:8px;margin:5px;}
+@media(max-width:768px){nav ul{flex-wrap:wrap;}}
+/* Confetti effect */
+.confetti {position:fixed;width:10px;height:10px;background:red;animation:fall 3s linear forwards;z-index:999;}
+@keyframes fall {0%{top:-10px}100%{top:100vh;transform:rotate(720deg)}}
 </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <div class="brand"><div class="logo">BT</div><div><h1>Budget Tracker</h1></div></div>
-    <nav>
-      <a data-section="dashboard" class="nav-link active">Dashboard</a>
-      <a data-section="add-expense" class="nav-link">Add</a>
-      <a data-section="reports" class="nav-link">Reports</a>
-      <a data-section="emotions" class="nav-link">Emotions</a>
-      <a data-section="settings" class="nav-link">Settings</a>
-    </nav>
-  </header>
+<nav>
+<h2>Budget Tracker</h2>
+<ul>
+<li><a onclick="showSection('dashboard')">Dashboard</a></li>
+<li><a onclick="showSection('add-expense')">Add Expense</a></li>
+<li><a onclick="showSection('reports')">Reports</a></li>
+<li><a onclick="showSection('emotions')">Emotions</a></li>
+<li><a onclick="showSection('settings')">Settings</a></li>
+</ul>
+</nav>
 
-  <!-- Dashboard -->
-  <section id="dashboard" class="active">
-    <div class="cards">
-      <div class="card"><h3>Total Budget</h3><div class="value" id="total-budget">₹0</div></div>
-      <div class="card"><h3>Total Expense</h3><div class="value" id="total-expense">₹0</div></div>
-      <div class="card"><h3>Remaining</h3><div class="value" id="remaining-budget">₹0</div><div class="progress"><i id="progress-fill"></i></div></div>
-      <div class="card"><h3>Level</h3><div class="value" id="level">1</div><div class="progress"><i id="level-fill"></i></div><div id="badges"></div><div id="streak">Streak: 0 days</div></div>
-    </div>
-    <div class="panel">
-      <h3>Recent</h3>
-      <ul id="recent-expenses" class="expense-list"></ul>
-    </div>
-  </section>
+<main>
+<section id="dashboard" class="active">
+<h3>Dashboard</h3>
+<div class="card"><b>Total Budget:</b> ₹<span id="total-budget">0</span></div>
+<div class="card"><b>Total Expense:</b> ₹<span id="total-expense">0</span></div>
+<div class="card"><b>Remaining:</b> ₹<span id="remaining-budget">0</span></div>
+<div class="card"><b>Savings Goal:</b> <span id="goal-progress"></span></div>
+<div class="card"><b>Streak:</b> <span id="streak"></span></div>
+<div class="card"><b>Level:</b> <span id="level">1</span> | XP: <span id="xp">0</span></div>
+<h4>Recent Expenses</h4>
+<ul id="recent-expenses"></ul>
+<div id="badges"></div>
+</section>
 
-  <!-- Add Expense -->
-  <section id="add-expense">
-    <div class="panel">
-      <h3>Add Expense</h3>
-      <form id="expense-form">
-        <input id="name" type="text" placeholder="Expense name" required>
-        <div class="row">
-          <input id="amount" type="number" placeholder="Amount" required class="half">
-          <input id="date" type="date" required class="half">
-        </div>
-        <div class="row">
-          <select id="category" required class="half"><option value="">Category</option><option>Food</option><option>Transport</option><option>Shopping</option><option>Utilities</option><option>Others</option></select>
-          <select id="emotion" required class="half"><option value="">Emotion</option><option>Happy</option><option>Sad</option><option>Stressed</option><option>Excited</option><option>Angry</option></select>
-        </div>
-        <button class="primary" type="submit">Add Expense</button>
-      </form>
-      <input id="search-expense" type="text" placeholder="Search expenses..." style="margin-top:12px;padding:10px;width:100%;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#fff">
-      <ul id="expense-list" class="expense-list" style="margin-top:12px;"></ul>
-    </div>
-  </section>
+<section id="add-expense">
+<h3>Add Expense</h3>
+<form id="expense-form">
+<input id="name" placeholder="Name" required>
+<input id="amount" type="number" placeholder="Amount (₹)" required>
+<input id="date" type="date" required>
+<select id="category" required>
+<option value="">Category</option>
+<option>Food</option><option>Transport</option><option>Shopping</option><option>Others</option>
+</select>
+<select id="emotion" required>
+<option value="">Emotion</option>
+<option>😊 Happy</option><option>😢 Sad</option><option>😫 Stressed</option><option>🤩 Excited</option><option>😡 Angry</option>
+</select>
+<button type="submit">Add</button>
+</form>
+<input type="text" id="search-expense" placeholder="Search...">
+<ul id="expense-list"></ul>
+</section>
 
-  <!-- Reports -->
-  <section id="reports">
-    <div class="charts">
-      <div class="chart-wrap panel"><h3>By Category</h3><canvas id="categoryChart"></canvas></div>
-      <div class="chart-wrap panel"><h3>Monthly</h3><canvas id="monthlyChart"></canvas></div>
-      <div class="chart-wrap panel"><h3>Emotion Distribution</h3><canvas id="emotionChart"></canvas></div>
-    </div>
-  </section>
+<section id="reports">
+<h3>Reports</h3>
+<div class="chart-container"><canvas id="categoryChart"></canvas></div>
+<div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+<div class="chart-container"><canvas id="emotionChart"></canvas></div>
+</section>
 
-  <!-- Emotions -->
-  <section id="emotions">
-    <div class="panel">
-      <h3>Emotion Insights</h3>
-      <p id="emotion-insight">Add expenses with emotions to see insights.</p>
-    </div>
-  </section>
+<section id="emotions">
+<h3>Emotion Analysis</h3>
+<p id="emotion-insight"></p>
+</section>
 
-  <!-- Settings -->
-  <section id="settings">
-    <div class="panel">
-      <h3>Settings</h3>
-      <form id="budget-form">
-        <input id="new-budget" type="number" placeholder="Set total budget" required>
-        <input id="goal-amount" type="number" placeholder="Set savings goal" required>
-        <div style="display:flex;gap:8px;margin-top:6px">
-          <button class="primary" type="submit">Save Budget & Goal</button>
-          <button class="ghost" id="export-btn" type="button">Export CSV</button>
-        </div>
-      </form>
-      <button class="ghost" id="reset-btn" style="margin-top:12px">Reset All Data</button>
-    </div>
-  </section>
-</div>
+<section id="settings">
+<h3>Settings</h3>
+<form id="budget-form">
+<input type="number" id="new-budget" placeholder="Set Budget (₹)">
+<input type="number" id="goal-amount" placeholder="Set Goal (₹)">
+<button type="submit">Save</button>
+</form>
+<button id="export-btn">Export CSV</button>
+<button id="reset-btn">Reset Data</button>
+</section>
+</main>
 
 <script>
-let expenses = JSON.parse(localStorage.getItem('expenses'))||[];
+let expenses=JSON.parse(localStorage.getItem('expenses'))||[];
 let totalBudget=parseFloat(localStorage.getItem('budget'))||50000;
 let goalAmount=parseFloat(localStorage.getItem('goalAmount'))||10000;
 let streakDays=parseInt(localStorage.getItem('streakDays'))||0;
 let lastDate=localStorage.getItem('lastDate')||null;
-let points=parseInt(localStorage.getItem('points'))||0;
-const fmt=v=>typeof v==='number'?v.toLocaleString():v;
+let xp=parseInt(localStorage.getItem('xp'))||0;
+let level=parseInt(localStorage.getItem('level'))||1;
 
-function setActiveNav(id){
-  document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('active',a.dataset.section===id));
-}
-document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click',()=>{showSection(a.dataset.section)}));
+let categoryChart, monthlyChart, emotionChart;
 
 function showSection(id){
-  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  setActiveNav(id);
-  if(id==='reports'){setTimeout(updateCharts,80);}
-  if(id==='emotions'){setTimeout(updateEmotionAnalysis,60);}
-  if(id==='dashboard'){setTimeout(updateDashboard,40);}
-}
-
-function saveData(){
-  localStorage.setItem('expenses',JSON.stringify(expenses));
-  localStorage.setItem('budget',totalBudget);
-  localStorage.setItem('goalAmount',goalAmount);
-  localStorage.setItem('streakDays',streakDays);
-  localStorage.setItem('lastDate',lastDate);
-  localStorage.setItem('points',points);
-}
-
-function renderExpenses(){
-  const list=document.getElementById('expense-list');
-  const recent=document.getElementById('recent-expenses');
-  list.innerHTML='';recent.innerHTML='';
-  expenses.slice().reverse().forEach((e,idx)=>{
-    const li=document.createElement('li');li.className='expense';
-    li.innerHTML=`<div>${e.name} • ₹${fmt(e.amount)}</div>
-      <div>${e.date} • ${e.category} • ${e.emotion}</div>
-      <button class="delete-btn">Delete</button>`;
-    li.querySelector('.delete-btn').addEventListener('click',()=>{
-      const i=expenses.indexOf(e);if(i>-1){expenses.splice(i,1);saveData();renderExpenses();updateDashboard();updateCharts();updateEmotionAnalysis();}
-    });
-    list.appendChild(li);
-    if(idx<5){const li2=li.cloneNode(true);li2.querySelector('.delete-btn').remove();recent.appendChild(li2);}
-  });
-}
-
-function updateDashboard(){
-  const totalExpense=expenses.reduce((a,b)=>a+Number(b.amount||0),0);
-  document.getElementById('total-budget').textContent=`₹${fmt(totalBudget)}`;
-  document.getElementById('total-expense').textContent=`₹${fmt(totalExpense)}`;
-  const remaining=totalBudget-totalExpense;
-  document.getElementById('remaining-budget').textContent=`₹${fmt(remaining)}`;
-  document.getElementById('progress-fill').style.width=Math.min(100,totalBudget?Math.round(totalExpense/totalBudget*100):0)+'%';
-  points=Math.floor(totalExpense/100);
-  const level=Math.floor(points/10)+1;
-  document.getElementById('level').textContent=level;
-  document.getElementById('level-fill').style.width=Math.min(100,(points%10)*10)+'%';
-  const badgesEl=document.getElementById('badges');badgesEl.innerHTML='';
-  if(points>=20){badgesEl.textContent='Saver 🏆';}
-  if(points>=50){badgesEl.textContent='Budget Master 🏆';}
-  if(points>=100){badgesEl.textContent='Finance Guru 🏆';}
-  const today=new Date().toISOString().split('T')[0];
-  if(lastDate!==today){const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];streakDays=lastDate===yesterday?streakDays+1:1;lastDate=today;saveData();}
-  document.getElementById('streak').textContent=`Streak: ${streakDays} days`;
-}
-
-let categoryChart,monthlyChart,emotionChart;
-function updateCharts(){
-  const cat={},mon={},emo={};
-  expenses.forEach(e=>{cat[e.category]=(cat[e.category]||0)+Number(e.amount||0);mon[e.date.substring(0,7)]?mon[e.date.substring(0,7)]+=Number(e.amount||0):mon[e.date.substring(0,7)]=Number(e.amount||0);emo[e.emotion]=(emo[e.emotion]||0)+Number(e.amount||0);});
-  if(categoryChart)categoryChart.destroy();
-  if(monthlyChart)monthlyChart.destroy();
-  if(emotionChart)emotionChart.destroy();
-  categoryChart=new Chart(document.getElementById('categoryChart').getContext('2d'),{type:'pie',data:{labels:Object.keys(cat),datasets:[{data:Object.values(cat),backgroundColor:['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db']}]},options:{responsive:true,maintainAspectRatio:false}});
-  monthlyChart=new Chart(document.getElementById('monthlyChart').getContext('2d'),{type:'bar',data:{labels:Object.keys(mon).sort(),datasets:[{label:'Expenses',data:Object.keys(mon).sort().map(k=>mon[k]),backgroundColor:'#50e3c2'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
-  emotionChart=new Chart(document.getElementById('emotionChart').getContext('2d'),{type:'doughnut',data:{labels:Object.keys(emo),datasets:[{data:Object.values(emo),backgroundColor:['#f5a623','#e74c3c','#9b59b6','#2ecc71','#3498db']}]},options:{responsive:true,maintainAspectRatio:false}});
-}
-
-function updateEmotionAnalysis(){
-  const emoMoney={};
-  expenses.forEach(e=>emoMoney[e.emotion]=(emoMoney[e.emotion]||0)+Number(e.amount||0));
-  let maxE=null,maxV=0;
-  for(const k in emoMoney){if(emoMoney[k]>maxV){maxV=emoMoney[k];maxE=k;}}
-  document.getElementById('emotion-insight').textContent=maxE?`💡 You spend most when you feel ${maxE} (₹${fmt(maxV)}).`:'Add expenses with emotions to see insights.';
+document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+if(id==='dashboard') updateDashboard();
+if(id==='reports') updateCharts();
+if(id==='emotions') updateEmotionAnalysis();
 }
 
 document.getElementById('expense-form').addEventListener('submit',e=>{
-  e.preventDefault();
-  const name=document.getElementById('name').value.trim();
-  const amount=Number(document.getElementById('amount').value);
-  const date=document.getElementById('date').value||new Date().toISOString().split('T')[0];
-  const category=document.getElementById('category').value||'Others';
-  const emotion=document.getElementById('emotion').value||'Neutral';
-  if(!name||!amount)return;
-  expenses.push({name,amount,date,category,emotion});
-  saveData();renderExpenses();updateDashboard();updateCharts();updateEmotionAnalysis();
-  e.target.reset();
+e.preventDefault();
+let exp={name:name.value,amount:parseFloat(amount.value),date:date.value,category:category.value,emotion:emotion.value};
+expenses.push(exp); 
+addXP(10); // gain XP for adding expense
+saveData(); renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis(); e.target.reset();
 });
 
-document.getElementById('search-expense').addEventListener('input',e=>{
-  const q=e.target.value.toLowerCase();
-  document.querySelectorAll('#expense-list li.expense').forEach(li=>{li.style.display=li.textContent.toLowerCase().includes(q)?'flex':'none';});
+function renderExpenses(){
+let list=document.getElementById('expense-list'); list.innerHTML='';
+let recent=document.getElementById('recent-expenses'); recent.innerHTML='';
+expenses.slice().reverse().forEach((e,i)=>{
+let li=document.createElement('li');
+li.textContent=`${e.date} | ${e.name} | ₹${e.amount} | ${e.category} | ${e.emotion}`;
+let btn=document.createElement('button'); btn.textContent='Delete'; btn.className='delete-btn';
+btn.onclick=()=>{expenses.splice(expenses.indexOf(e),1);saveData();renderExpenses();updateDashboard();updateCharts();updateEmotionAnalysis();};
+li.appendChild(btn); list.appendChild(li);
+if(i<5){let li2=document.createElement('li');li2.textContent=li.textContent;recent.appendChild(li2);}
 });
+}
+
+function updateDashboard(){
+let total=expenses.reduce((a,b)=>a+b.amount,0);
+document.getElementById('total-budget').textContent=totalBudget;
+document.getElementById('total-expense').textContent=total;
+document.getElementById('remaining-budget').textContent=totalBudget-total;
+document.getElementById('goal-progress').textContent=`₹${total} / ₹${goalAmount}`;
+let today=new Date().toISOString().split('T')[0];
+if(lastDate===today){} else if(lastDate===new Date(Date.now()-86400000).toISOString().split('T')[0]){streakDays++; awardBadge('Streak Master');} else{streakDays=1;}
+lastDate=today;
+document.getElementById('streak').textContent=streakDays+' days';
+document.getElementById('xp').textContent=xp; document.getElementById('level').textContent=level;
+checkGoal(total);
+displayBadges();
+saveData();
+}
+
+function updateCharts(){
+let ctx1=document.getElementById('categoryChart').getContext('2d');
+let ctx2=document.getElementById('monthlyChart').getContext('2d');
+let ctx3=document.getElementById('emotionChart').getContext('2d');
+if(categoryChart) categoryChart.destroy();
+if(monthlyChart) monthlyChart.destroy();
+if(emotionChart) emotionChart.destroy();
+let catMap={},monthMap={},emoMap={};
+expenses.forEach(e=>{
+catMap[e.category]=(catMap[e.category]||0)+e.amount;
+monthMap[e.date.substring(0,7)]=(monthMap[e.date.substring(0,7)]||0)+e.amount;
+emoMap[e.emotion]=(emoMap[e.emotion]||0)+1;
+});
+categoryChart=new Chart(ctx1,{type:'pie',data:{labels:Object.keys(catMap),datasets:[{data:Object.values(catMap),backgroundColor:['#ff9800','#4caf50','#2196f3','#e91e63']}]}});  
+monthlyChart=new Chart(ctx2,{type:'bar',data:{labels:Object.keys(monthMap),datasets:[{data:Object.values(monthMap),backgroundColor:'#9c27b0'}]}});  
+emotionChart=new Chart(ctx3,{type:'doughnut',data:{labels:Object.keys(emoMap),datasets:[{data:Object.values(emoMap),backgroundColor:['#f44336','#2196f3','#4caf50','#ffc107','#9c27b0']}]}});  
+}
+
+function updateEmotionAnalysis(){
+let emoSpend={}; expenses.forEach(e=>{emoSpend[e.emotion]=(emoSpend[e.emotion]||0)+e.amount;});
+let top=Object.entries(emoSpend).sort((a,b)=>b[1]-a[1])[0];
+document.getElementById('emotion-insight').textContent=top?`You spend the most when feeling ${top[0]}`:'Add expenses to see insights.';
+}
 
 document.getElementById('budget-form').addEventListener('submit',e=>{
-  e.preventDefault();
-  const nb=Number(document.getElementById('new-budget').value);
-  const ng=Number(document.getElementById('goal-amount').value);
-  if(!isNaN(nb))totalBudget=nb;
-  if(!isNaN(ng))goalAmount=ng;
-  saveData();
-  updateDashboard();
+e.preventDefault();
+totalBudget=parseFloat(document.getElementById('new-budget').value)||totalBudget;
+goalAmount=parseFloat(document.getElementById('goal-amount').value)||goalAmount;
+saveData(); updateDashboard(); e.target.reset();
 });
 
 document.getElementById('export-btn').addEventListener('click',()=>{
-  let csv='Name,Amount,Date,Category,Emotion\n'+expenses.map(e=>`${e.name},${e.amount},${e.date},${e.category},${e.emotion}`).join('\n');
-  let a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='expenses.csv';a.click();
+let csv='Date,Name,Amount,Category,Emotion\n';
+expenses.forEach(e=>{csv+=`${e.date},${e.name},${e.amount},${e.category},${e.emotion}\n`;});
+let blob=new Blob([csv],{type:'text/csv'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='expenses.csv'; a.click();
 });
 
 document.getElementById('reset-btn').addEventListener('click',()=>{
-  if(confirm('Are you sure you want to reset all data?')){expenses=[];totalBudget=50000;goalAmount=10000;streakDays=0;points=0;lastDate=null;saveData();renderExpenses();updateDashboard();updateCharts();updateEmotionAnalysis();}
+if(confirm('Reset all data?')){expenses=[];totalBudget=50000;goalAmount=10000;streakDays=0;lastDate=null;xp=0;level=1;badges=[];saveData();renderExpenses();updateDashboard();updateCharts();updateEmotionAnalysis();}
 });
 
-window.addEventListener('resize',()=>{if(document.getElementById('reports').classList.contains('active'))updateCharts();});
+document.getElementById('search-expense').addEventListener('input',e=>{
+let q=e.target.value.toLowerCase();
+document.querySelectorAll('#expense-list li').forEach(li=>li.style.display=li.textContent.toLowerCase().includes(q)?'flex':'none');
+});
 
-renderExpenses();updateDashboard();updateCharts();updateEmotionAnalysis();
+function saveData(){
+localStorage.setItem('expenses',JSON.stringify(expenses));
+localStorage.setItem('budget',totalBudget);
+localStorage.setItem('goalAmount',goalAmount);
+localStorage.setItem('streakDays',streakDays);
+localStorage.setItem('lastDate',lastDate);
+localStorage.setItem('xp',xp);
+localStorage.setItem('level',level);
+localStorage.setItem('badges',JSON.stringify(badges));
+}
+
+// GAMIFICATION SYSTEM
+let badges=JSON.parse(localStorage.getItem('badges'))||[];
+
+function addXP(amount){
+xp+=amount;
+while(xp>=level*50){xp-=level*50;level++; awardBadge('Level Up'); showConfetti();}
+updateDashboard();
+}
+
+function awardBadge(name){if(!badges.includes(name)){badges.push(name); showConfetti();}}
+
+function displayBadges(){
+let container=document.getElementById('badges'); container.innerHTML='';
+badges.forEach(b=>{let span=document.createElement('span'); span.className='badge'; span.textContent=b; container.appendChild(span);});
+}
+
+function showConfetti(){
+for(let i=0;i<50;i++){
+let div=document.createElement('div'); div.className='confetti';
+div.style.backgroundColor=`hsl(${Math.random()*360},100%,50%)`;
+div.style.left=Math.random()*window.innerWidth+'px';
+div.style.animationDuration=2+Math.random()*2+'s';
+document.body.appendChild(div);
+setTimeout(()=>div.remove(),3000);
+}
+}
+
+function checkGoal(total){
+if(total>=goalAmount){awardBadge('Goal Achiever');}
+}
+
+renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis(); displayBadges();
 </script>
 </body>
 </html>
