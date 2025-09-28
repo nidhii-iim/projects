@@ -3,73 +3,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elegant Budget & Emotion Tracker</title>
+<title>Budget & Emotion Tracker</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 /* Reset & base */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
-body{background:#f2f2f7;color:#333;line-height:1.5;}
-main{max-width:900px;margin:20px auto;padding:0 15px;}
-h2,h3,h4{margin-bottom:12px;font-weight:600;}
+body{background:#f4f6f8;color:#333;line-height:1.6;font-size:16px;}
+main{max-width:900px;margin:0 auto;padding:10px;}
 
 /* Smooth jump */
-section{padding:30px 0;transition:transform 0.5s ease;}
+section{padding:40px 15px;transition:transform 0.4s ease;scroll-margin-top:80px;}
 
 /* Navigation */
 nav{
   display:flex;justify-content:space-between;align-items:center;
-  padding:15px 20px;background:#f9a8d4;color:white;position:sticky;top:0;z-index:1000;
+  padding:15px 20px;background:#3a86ff;color:white;position:sticky;top:0;z-index:1000;
   box-shadow:0 4px 12px rgba(0,0,0,0.1);border-radius:0 0 15px 15px;
 }
 nav h2{font-size:1.5em;color:white;}
 nav ul{display:flex;list-style:none;gap:12px;transition:max-height 0.3s;}
-nav ul li a{color:white;text-decoration:none;padding:8px 12px;border-radius:8px;transition:0.3s;font-weight:500;}
-nav ul li a.active,nav ul li a:hover{background:#f472b6;}
-.hamburger{display:none;flex-direction:column;cursor:pointer;}
-.hamburger div{width:25px;height:3px;background:white;margin:3px 0;transition:0.3s;}
+nav ul li a{color:white;text-decoration:none;padding:10px 15px;border-radius:12px;transition:0.3s;font-weight:500;}
+nav ul li a.active,nav ul li a:hover{background:#a5d8ff;color:#003566;}
+.hamburger{display:none;flex-direction:column;cursor:pointer;position:absolute;top:18px;right:20px;z-index:1100;}
+.hamburger div{width:28px;height:3px;background:white;margin:4px 0;transition:0.3s;}
 
-/* Card style */
+/* Cards */
 .card{
-  background:#fff9fc;padding:20px;margin:15px 0;border-radius:15px;
-  box-shadow:0 6px 20px rgba(0,0,0,0.08);
-  transition:transform 0.4s ease;
+  background:#ffffff;padding:20px;margin:15px 0;border-radius:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);transition:transform 0.3s;
 }
-.card:hover{transform:translateY(-5px);}
+.card:hover{transform:translateY(-4px);}
 
 /* Forms */
-form input,form select,form button{display:block;width:100%;margin:10px 0;padding:12px;border-radius:10px;border:1px solid #eee;font-size:1em;}
-form button{background:#f9a8d4;color:white;font-weight:bold;cursor:pointer;transition:0.3s;}
-form button:hover{background:#f472b6;}
+form input,form select,form button{
+  display:block;width:100%;margin:12px 0;padding:14px;border-radius:12px;border:1px solid #d1d5db;font-size:1em;
+}
+form button{background:#3a86ff;color:white;font-weight:bold;cursor:pointer;transition:0.3s;}
+form button:hover{background:#5fa0ff;}
 
 /* Lists */
 #expense-list li,#recent-expenses li{
   display:flex;justify-content:space-between;align-items:center;
-  background:#fff9fc;padding:10px;margin:6px 0;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.05);
-  flex-wrap:wrap;
+  background:#f8fafc;padding:12px;margin:8px 0;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.05);flex-wrap:wrap;
 }
-.delete-btn{background:#ff6b6b;color:white;border:none;padding:5px 10px;border-radius:8px;cursor:pointer;}
+.delete-btn{background:#ff6b6b;color:white;border:none;padding:6px 12px;border-radius:10px;cursor:pointer;}
 .delete-btn:hover{background:#ff3b3b;}
 
 /* Charts */
-.chart-container{background:#fff9fc;padding:15px;border-radius:15px;margin:15px 0;box-shadow:0 6px 20px rgba(0,0,0,0.08);}
+.chart-container{background:#f8fafc;padding:20px;border-radius:18px;margin:15px 0;box-shadow:0 6px 20px rgba(0,0,0,0.08);}
 canvas{max-width:100%;height:300px!important;}
 
 /* Badges */
-.badge{display:inline-block;background:#ffd6e0;color:#ff1a75;padding:5px 10px;border-radius:12px;margin:5px;font-weight:600;}
+.badge{display:inline-block;background:#cce5ff;color:#003566;padding:6px 12px;border-radius:16px;margin:5px;font-weight:600;}
 
 /* Progress bars */
-.progress-bar{background:#ffe5f0;border-radius:12px;overflow:hidden;height:20px;margin:8px 0;}
-.progress{background:#f472b6;height:100%;width:0%;transition:0.5s;}
+.progress-bar{background:#e2e8f0;border-radius:16px;overflow:hidden;height:24px;margin:10px 0;}
+.progress{background:#3a86ff;height:100%;width:0%;transition:0.5s;}
 
 /* Confetti */
-.confetti{position:fixed;width:10px;height:10px;z-index:999;animation:fall 3s linear forwards;}
+.confetti{position:fixed;width:12px;height:12px;z-index:999;animation:fall 3s linear forwards;}
 @keyframes fall{0%{top:-10px}100%{top:100vh;transform:rotate(720deg);}}
 
 /* Responsive */
 @media(max-width:768px){
-  nav ul{flex-direction:column;max-height:0;overflow:hidden;width:100%;background:#f9a8d4;border-radius:0 0 12px 12px;}
+  nav ul{flex-direction:column;max-height:0;overflow:hidden;width:90%;background:#3a86ff;border-radius:12px;position:absolute;top:60px;right:5%;box-shadow:0 4px 12px rgba(0,0,0,0.15);}
   nav ul.show{max-height:400px;}
   .hamburger{display:flex;}
+  main{padding:10px;}
+  form input,form select,form button{padding:12px;}
 }
 </style>
 </head>
@@ -88,7 +89,6 @@ canvas{max-width:100%;height:300px!important;}
 </nav>
 
 <main>
-<!-- Dashboard -->
 <section id="dashboard">
 <h3>Dashboard</h3>
 <div class="card"><b>Total Budget:</b> ₹<span id="total-budget">0</span></div>
@@ -110,7 +110,6 @@ canvas{max-width:100%;height:300px!important;}
 <div id="badges"></div>
 </section>
 
-<!-- Add Expense -->
 <section id="add-expense">
 <h3>Add Expense</h3>
 <form id="expense-form">
@@ -138,7 +137,6 @@ canvas{max-width:100%;height:300px!important;}
 <ul id="expense-list"></ul>
 </section>
 
-<!-- Reports -->
 <section id="reports">
 <h3>Reports</h3>
 <div class="chart-container"><canvas id="categoryChart"></canvas></div>
@@ -146,13 +144,11 @@ canvas{max-width:100%;height:300px!important;}
 <div class="chart-container"><canvas id="emotionChart"></canvas></div>
 </section>
 
-<!-- Emotions -->
 <section id="emotions">
 <h3>Emotion Analysis</h3>
 <p id="emotion-insight">Add expenses to see insights.</p>
 </section>
 
-<!-- Settings -->
 <section id="settings">
 <h3>Settings</h3>
 <form id="budget-form">
@@ -163,6 +159,7 @@ canvas{max-width:100%;height:300px!important;}
 <button id="export-btn">Export CSV</button>
 <button id="reset-btn">Reset Data</button>
 </section>
+
 </main>
 
 <script>
@@ -241,9 +238,9 @@ function updateCharts(){
   if(emotionChart) emotionChart.destroy();
   let catMap={},monthMap={},emoMap={};
   expenses.forEach(e=>{catMap[e.category]=(catMap[e.category]||0)+e.amount;monthMap[e.date.substring(0,7)] = (monthMap[e.date.substring(0,7)]||0)+e.amount;emoMap[e.emotion]=(emoMap[e.emotion]||0)+1;});
-  categoryChart=new Chart(ctx1,{type:'pie',data:{labels:Object.keys(catMap),datasets:[{data:Object.values(catMap),backgroundColor:['#f9a8d4','#c4f1f9','#fbe4b5','#fbcbe7']}]}});  
+  categoryChart=new Chart(ctx1,{type:'pie',data:{labels:Object.keys(catMap),datasets:[{data:Object.values(catMap),backgroundColor:['#a5d8ff','#c4f1f9','#b5ead7','#d6c6f5']}]}});  
   monthlyChart=new Chart(ctx2,{type:'bar',data:{labels:Object.keys(monthMap),datasets:[{data:Object.values(monthMap),backgroundColor:'#c4f1f9'}]}});  
-  emotionChart=new Chart(ctx3,{type:'doughnut',data:{labels:Object.keys(emoMap),datasets:[{data:Object.values(emoMap),backgroundColor:['#f9a8d4','#fbcbe7','#c4f1f9','#fbe4b5','#ffd6e0']}]}});  
+  emotionChart=new Chart(ctx3,{type:'doughnut',data:{labels:Object.keys(emoMap),datasets:[{data:Object.values(emoMap),backgroundColor:['#a5d8ff','#c4f1f9','#b5ead7','#d6c6f5','#d1d5db']}]}});  
 }
 
 /* --- Emotion Analysis --- */
@@ -287,7 +284,7 @@ function saveData(){
 function addXP(amount){xp+=amount;while(xp>=level*50){xp-=level*50;level++;awardBadge('Level Up');showConfetti();}updateDashboard();}
 function awardBadge(name){if(!badges.includes(name)){badges.push(name);showConfetti();}}
 function displayBadges(){let container=document.getElementById('badges'); container.innerHTML=''; badges.forEach(b=>{let span=document.createElement('span');span.className='badge';span.textContent=b;container.appendChild(span);});}
-function showConfetti(){for(let i=0;i<50;i++){let div=document.createElement('div');div.className='confetti';div.style.backgroundColor=`hsl(${Math.random()*360},100%,70%)`;div.style.left=Math.random()*window.innerWidth+'px';div.style.animationDuration=2+Math.random()*2+'s';document.body.appendChild(div);setTimeout(()=>div.remove(),3000);}}
+function showConfetti(){for(let i=0;i<50;i++){let div=document.createElement('div');div.className='confetti';div.style.backgroundColor=`hsl(${Math.random()*360},70%,70%)`;div.style.left=Math.random()*window.innerWidth+'px';div.style.animationDuration=2+Math.random()*2+'s';document.body.appendChild(div);setTimeout(()=>div.remove(),3000);}}
 function checkGoal(total){if(total>=goalAmount){awardBadge('Goal Achiever');}}
 
 /* --- Init --- */
