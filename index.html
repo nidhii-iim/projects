@@ -3,32 +3,22 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Premium Mobile Budget Tracker — Fixed</title>
+<title>Premium Mobile Budget Tracker — Ready</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  /* ---------- BASE ---------- */
   :root{
     --bg1:#0f1724; --accent1:#4a90e2; --accent2:#50e3c2;
     --glass: rgba(255,255,255,0.08); --glass-strong: rgba(255,255,255,0.14);
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-    background: linear-gradient(120deg,var(--bg1) 0%, #122233 60%, #0b2233 100%);
-    color: #fff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-  }
-
-  /* ---------- BACKGROUND ---------- */
+  html,body{height:100%; margin:0; font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial; background: linear-gradient(120deg,var(--bg1) 0%, #122233 60%, #0b2233 100%); color: #fff;}
   .bg-wrap{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
   .bg-wave{position:absolute;left:50%;transform:translateX(-50%);bottom:-10vh;width:160vw;height:60vh;opacity:0.12;filter:blur(22px)}
   .bg-vignette{position:fixed;inset:0;background:radial-gradient(1000px 600px at 10% 10%, rgba(255,255,255,0.02), transparent 10%), radial-gradient(900px 500px at 90% 90%, rgba(255,255,255,0.02), transparent 12%);pointer-events:none;z-index:0}
   .particles{position:fixed;inset:0;z-index:0;pointer-events:none}
   .particle{position:absolute;border-radius:50%;opacity:0.06;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.1));animation:float 22s linear infinite}
   @keyframes float{0%{transform:translateY(100vh) translateX(0) scale(.6)}50%{transform:translateY(40vh) translateX(30vw) scale(1)}100%{transform:translateY(-10vh) translateX(60vw) scale(.6)}}
-
-  /* ---------- LAYOUT ---------- */
   .app {position:relative;z-index:1;max-width:980px;margin:0 auto;padding:14px 16px 72px;}
   header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
   .brand{display:flex;gap:12px;align-items:center}
@@ -36,11 +26,9 @@
   h1{font-size:1.05rem;margin:0}
   .menu-btn{display:none;flex-direction:column;gap:4px;padding:8px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.02);cursor:pointer}
   .menu-btn span{width:20px;height:2px;background:linear-gradient(90deg,#fff,rgba(255,255,255,0.8));display:block;border-radius:2px}
-
   nav{display:flex;gap:8px;align-items:center}
   nav a{padding:8px 12px;border-radius:12px;text-decoration:none;color:rgba(255,255,255,0.9);font-weight:600;cursor:pointer}
   nav a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#052a34;box-shadow:0 8px 26px rgba(74,144,226,0.14)}
-
   .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
   .card{background:var(--glass);border-radius:14px;padding:12px;box-shadow: 0 6px 18px rgba(2,6,23,0.45);backdrop-filter: blur(8px);border:1px solid rgba(255,255,255,0.03);transition:transform .22s, box-shadow .22s}
   .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,23,0.6)}
@@ -48,43 +36,34 @@
   .card .value{font-weight:700;font-size:1.15rem;margin-top:6px;color:#fff}
   .progress{height:10px;background:rgba(255,255,255,0.06);border-radius:999px;margin-top:8px;overflow:hidden}
   .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .8s ease}
-
   .section{margin-top:8px}
   .panel{background:var(--glass-strong);border-radius:14px;padding:12px;box-shadow:0 12px 28px rgba(2,6,23,0.45);border:1px solid rgba(255,255,255,0.04)}
-
   form{display:flex;flex-direction:column;gap:10px}
   .row{display:flex;gap:8px;align-items:center}
   .row .half{flex:1}
   input[type=text], input[type=number], input[type=date], select{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.12);color:#fff;font-size:14px}
   button.primary{padding:12px 16px;border-radius:999px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#062433;font-weight:700;cursor:pointer}
   button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#fff;padding:10px 12px;border-radius:10px}
-
   ul.expense-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
   li.expense{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border-radius:10px;background:rgba(0,0,0,0.16);border:1px solid rgba(255,255,255,0.03)}
   .meta{display:flex;flex-direction:column;gap:4px}
   .meta .name{font-weight:600}
   .meta .small{font-size:12px;color:rgba(255,255,255,0.75)}
-
   .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .chart-wrap{min-width:280px;border-radius:12px;overflow:hidden}
-
+  .badge{display:inline-block;padding:2px 6px;margin-right:4px;background:rgba(255,255,255,0.1);border-radius:6px;font-size:12px;color:#fff}
   #challenge-popup{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:1200;display:none;padding:14px;border-radius:14px;background:linear-gradient(180deg,#ffffff,#f7f7f7);color:#112;box-shadow:0 18px 40px rgba(2,6,23,0.6)}
   .confetti{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:1200;opacity:0.95}
-
   @media (max-width:900px){ .cards{grid-template-columns:repeat(2,1fr)} .charts{grid-template-columns:1fr} }
-  @media (max-width:520px){
-    .brand h1{display:none} .menu-btn{display:flex} nav{display:none}
-    .cards{grid-template-columns:1fr} .app{padding:12px} .chart-wrap{min-width:320px}
-  }
+  @media (max-width:520px){ .brand h1{display:none} .menu-btn{display:flex} nav{display:none} .cards{grid-template-columns:1fr} .app{padding:12px} .chart-wrap{min-width:320px} }
   .mobile-nav{position:fixed;top:68px;left:8px;right:8px;background:var(--glass);backdrop-filter:blur(8px);border-radius:12px;padding:8px;display:none;z-index:150}
   .mobile-nav a{display:block;padding:10px;border-radius:8px;color:#eaf7ff}
   .mobile-nav.show{display:block}
 </style>
 </head>
 <body>
-  <!-- realistic background -->
   <div class="bg-wrap" aria-hidden="true">
-    <svg class="bg-wave" viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <svg class="bg-wave" viewBox="0 0 1200 200" preserveAspectRatio="none">
       <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a90e2"/><stop offset="1" stop-color="#50e3c2"/></linearGradient></defs>
       <path d="M0,200 C150,120 350,40 600,60 C850,80 1050,160 1200,140 L1200 200 L0 200 Z" fill="url(#g1)"/>
     </svg>
@@ -102,7 +81,6 @@
         <div class="logo">BT</div>
         <div><h1>Budget Tracker</h1><div style="font-size:12px;color:rgba(255,255,255,0.75)">Smart • Gamified • Emotion-aware</div></div>
       </div>
-
       <div style="display:flex;align-items:center;gap:8px">
         <button class="menu-btn" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
         <nav id="main-nav" aria-label="Main navigation">
@@ -125,15 +103,15 @@
 
     <main>
       <!-- DASHBOARD -->
-      <section id="dashboard" class="section active" aria-labelledby="dashboard">
-        <div class="cards" role="region" aria-label="summary cards">
+      <section id="dashboard" class="section active">
+        <div class="cards">
           <div class="card"><h3>Total Budget</h3><div class="value" id="total-budget">₹0</div></div>
           <div class="card"><h3>Total Expense</h3><div class="value" id="total-expense">₹0</div></div>
           <div class="card"><h3>Remaining</h3><div class="value" id="remaining-budget">₹0</div><div class="progress"><i id="progress-fill"></i></div></div>
           <div class="card"><h3>Level</h3><div class="value" id="level">1</div><div class="progress"><i id="level-fill"></i></div><div id="badges" style="margin-top:8px"></div><div style="margin-top:6px;color:rgba(255,255,255,0.9)" id="streak">Streak: 0 days</div></div>
         </div>
 
-        <div class="section"><div class="panel"><h3 style="margin-top:0">Recent</h3><ul id="recent-expenses" class="expense-list" aria-live="polite"></ul></div></div>
+        <div class="section"><div class="panel"><h3 style="margin-top:0">Recent</h3><ul id="recent-expenses" class="expense-list"></ul></div></div>
 
         <div class="cards" style="margin-top:12px">
           <div class="card"><h3>Savings Goal</h3><div class="value" id="goal-progress">₹0 / ₹0</div><div class="progress"><i id="goal-fill"></i></div></div>
@@ -142,7 +120,7 @@
       </section>
 
       <!-- ADD -->
-      <section id="add-expense" class="section" aria-labelledby="add-expense">
+      <section id="add-expense" class="section">
         <div class="panel">
           <h3 style="margin-top:0">Add Expense</h3>
           <form id="expense-form" autocomplete="off">
@@ -157,17 +135,15 @@
             </div>
             <button class="primary" type="submit">Add Expense</button>
           </form>
-
           <div style="margin-top:10px">
             <input id="search-expense" type="text" placeholder="Search expenses (name, category, emotion)..." style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%;background:transparent;color:#fff">
           </div>
-
-          <div style="margin-top:12px"><ul id="expense-list" class="expense-list" aria-live="polite"></ul></div>
+          <div style="margin-top:12px"><ul id="expense-list" class="expense-list"></ul></div>
         </div>
       </section>
 
       <!-- REPORTS -->
-      <section id="reports" class="section" aria-labelledby="reports">
+      <section id="reports" class="section">
         <div class="charts" style="margin-bottom:12px">
           <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">By Category</h3><canvas id="categoryChart"></canvas></div>
           <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">Monthly</h3><canvas id="monthlyChart"></canvas></div>
@@ -176,12 +152,12 @@
       </section>
 
       <!-- EMOTIONS -->
-      <section id="emotions" class="section" aria-labelledby="emotions">
+      <section id="emotions" class="section">
         <div class="panel"><h3 style="margin-top:0">Emotion Insights</h3><p id="emotion-insight" style="font-weight:600;color:#eaf7ff">No data yet — add expenses with emotions.</p></div>
       </section>
 
       <!-- SETTINGS -->
-      <section id="settings" class="section" aria-labelledby="settings">
+      <section id="settings" class="section">
         <div class="panel">
           <h3 style="margin-top:0">Settings</h3>
           <form id="budget-form">
@@ -197,6 +173,7 @@
 
   <div id="challenge-popup" role="dialog" aria-modal="true"><div id="challenge-text" style="font-weight:700"></div><div style="margin-top:12px;text-align:center"><button onclick="closeChallenge()" class="primary">Got it</button></div></div>
 
+  
 <script>
 /* -------------------------
    App state & persistence
@@ -461,4 +438,5 @@ window.addEventListener('resize', () => {
 </script>
 </body>
 </html>
+
 
