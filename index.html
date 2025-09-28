@@ -3,40 +3,121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Budget & Emotion Tracker with Gamification</title>
+<title>Budget & Emotion Tracker - Fun & Mobile Friendly</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body {margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#74ebd5,#9face6);color:#333;overflow-x:hidden;}
-nav {display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#222;color:#fff;position:sticky;top:0;z-index:100;}
-nav ul {display:flex;list-style:none;gap:15px;}
-nav ul li a {color:#fff;text-decoration:none;cursor:pointer;}
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#74ebd5,#9face6);
+  color:#333;
+  overflow-x:hidden;
+}
+nav {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 20px;
+  background:#222;
+  color:#fff;
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+nav h2 {margin:0;font-size:1.5em;}
+nav ul {
+  display:flex;
+  list-style:none;
+  gap:15px;
+  transition: max-height 0.3s;
+}
+nav ul li a {
+  color:#fff;
+  text-decoration:none;
+  cursor:pointer;
+  padding:5px 8px;
+  border-radius:5px;
+}
+nav ul li a:hover, nav ul li a.active {background:#ff9800;}
+.hamburger {
+  display:none;
+  flex-direction:column;
+  cursor:pointer;
+}
+.hamburger div {
+  width:25px;
+  height:3px;
+  background:white;
+  margin:4px 0;
+  transition:0.4s;
+}
 main {max-width:1000px;margin:20px auto;padding:0 15px;}
-section {display:none;}
+section {display:none;scroll-margin-top:70px;}
 section.active {display:block;}
-.card {background:rgba(255,255,255,0.8);padding:15px;margin:10px 0;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
-form input,form select,form button{display:block;width:100%;margin:8px 0;padding:10px;border:none;border-radius:8px;}
-form button{background:#ff9800;color:white;font-weight:bold;cursor:pointer;}
-#expense-list li,#recent-expenses li{background:rgba(255,255,255,0.8);margin:5px 0;padding:10px;border-radius:8px;display:flex;justify-content:space-between;flex-wrap:wrap;}
-.delete-btn{background:red;color:#fff;border:none;padding:5px 10px;border-radius:5px;}
-.chart-container{background:rgba(255,255,255,0.8);padding:10px;border-radius:10px;margin:10px 0;}
+.card {
+  background:rgba(255,255,255,0.85);
+  padding:15px;margin:10px 0;
+  border-radius:10px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+form input, form select, form button {
+  display:block;width:100%;margin:8px 0;padding:10px;border:none;border-radius:8px;
+}
+form button {
+  background:#ff9800;color:white;font-weight:bold;cursor:pointer;
+}
+#expense-list li, #recent-expenses li {
+  background:rgba(255,255,255,0.8);
+  margin:5px 0;
+  padding:10px;
+  border-radius:8px;
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+}
+.delete-btn {
+  background:red;color:#fff;border:none;padding:5px 10px;border-radius:5px;
+}
+.chart-container {
+  background:rgba(255,255,255,0.8);
+  padding:10px;border-radius:10px;margin:10px 0;
+}
 canvas{max-width:100%;height:300px !important;}
-.badge{display:inline-block;background:#ffd700;color:#000;padding:5px 10px;border-radius:8px;margin:5px;}
-@media(max-width:768px){nav ul{flex-wrap:wrap;}}
-/* Confetti effect */
-.confetti {position:fixed;width:10px;height:10px;background:red;animation:fall 3s linear forwards;z-index:999;}
+.badge {
+  display:inline-block;
+  background:#ffd700;color:#000;
+  padding:5px 10px;border-radius:8px;margin:5px;
+}
+@media(max-width:768px){
+  nav ul {
+    flex-direction:column;
+    max-height:0;
+    overflow:hidden;
+    width:100%;
+    background:#222;
+  }
+  nav ul.show {max-height:300px;}
+  .hamburger {display:flex;}
+}
+.confetti {
+  position:fixed;width:10px;height:10px;background:red;
+  animation:fall 3s linear forwards;z-index:999;
+}
 @keyframes fall {0%{top:-10px}100%{top:100vh;transform:rotate(720deg)}}
 </style>
 </head>
 <body>
+
 <nav>
-<h2>Budget Tracker</h2>
-<ul>
-<li><a onclick="showSection('dashboard')">Dashboard</a></li>
-<li><a onclick="showSection('add-expense')">Add Expense</a></li>
-<li><a onclick="showSection('reports')">Reports</a></li>
-<li><a onclick="showSection('emotions')">Emotions</a></li>
-<li><a onclick="showSection('settings')">Settings</a></li>
-</ul>
+  <h2>Budget Tracker</h2>
+  <div class="hamburger" onclick="toggleMenu()"><div></div><div></div><div></div></div>
+  <ul id="nav-links">
+    <li><a onclick="scrollToSection('dashboard')">Dashboard</a></li>
+    <li><a onclick="scrollToSection('add-expense')">Add Expense</a></li>
+    <li><a onclick="scrollToSection('reports')">Reports</a></li>
+    <li><a onclick="scrollToSection('emotions')">Emotions</a></li>
+    <li><a onclick="scrollToSection('settings')">Settings</a></li>
+  </ul>
 </nav>
 
 <main>
@@ -95,6 +176,7 @@ canvas{max-width:100%;height:300px !important;}
 <button id="export-btn">Export CSV</button>
 <button id="reset-btn">Reset Data</button>
 </section>
+
 </main>
 
 <script>
@@ -105,22 +187,29 @@ let streakDays=parseInt(localStorage.getItem('streakDays'))||0;
 let lastDate=localStorage.getItem('lastDate')||null;
 let xp=parseInt(localStorage.getItem('xp'))||0;
 let level=parseInt(localStorage.getItem('level'))||1;
+let badges=JSON.parse(localStorage.getItem('badges'))||[];
 
 let categoryChart, monthlyChart, emotionChart;
 
-function showSection(id){
-document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
-document.getElementById(id).classList.add('active');
+function toggleMenu(){
+document.getElementById('nav-links').classList.toggle('show');
+}
+
+function scrollToSection(id){
+document.getElementById(id).scrollIntoView({behavior:'smooth'});
+document.querySelectorAll('nav ul li a').forEach(a=>a.classList.remove('active'));
+document.querySelector(`nav ul li a[onclick="scrollToSection('${id}')"]`).classList.add('active');
 if(id==='dashboard') updateDashboard();
 if(id==='reports') updateCharts();
 if(id==='emotions') updateEmotionAnalysis();
+if(window.innerWidth<768) toggleMenu();
 }
 
 document.getElementById('expense-form').addEventListener('submit',e=>{
 e.preventDefault();
 let exp={name:name.value,amount:parseFloat(amount.value),date:date.value,category:category.value,emotion:emotion.value};
 expenses.push(exp); 
-addXP(10); // gain XP for adding expense
+addXP(10);
 saveData(); renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis(); e.target.reset();
 });
 
@@ -163,7 +252,7 @@ if(emotionChart) emotionChart.destroy();
 let catMap={},monthMap={},emoMap={};
 expenses.forEach(e=>{
 catMap[e.category]=(catMap[e.category]||0)+e.amount;
-monthMap[e.date.substring(0,7)]=(monthMap[e.date.substring(0,7)]||0)+e.amount;
+monthMap[e.date.substring(0,7)] = (monthMap[e.date.substring(0,7)]||0)+e.amount;
 emoMap[e.emotion]=(emoMap[e.emotion]||0)+1;
 });
 categoryChart=new Chart(ctx1,{type:'pie',data:{labels:Object.keys(catMap),datasets:[{data:Object.values(catMap),backgroundColor:['#ff9800','#4caf50','#2196f3','#e91e63']}]}});  
@@ -210,38 +299,15 @@ localStorage.setItem('level',level);
 localStorage.setItem('badges',JSON.stringify(badges));
 }
 
-// GAMIFICATION SYSTEM
-let badges=JSON.parse(localStorage.getItem('badges'))||[];
-
-function addXP(amount){
-xp+=amount;
-while(xp>=level*50){xp-=level*50;level++; awardBadge('Level Up'); showConfetti();}
-updateDashboard();
-}
-
-function awardBadge(name){if(!badges.includes(name)){badges.push(name); showConfetti();}}
-
-function displayBadges(){
-let container=document.getElementById('badges'); container.innerHTML='';
-badges.forEach(b=>{let span=document.createElement('span'); span.className='badge'; span.textContent=b; container.appendChild(span);});
-}
-
-function showConfetti(){
-for(let i=0;i<50;i++){
-let div=document.createElement('div'); div.className='confetti';
-div.style.backgroundColor=`hsl(${Math.random()*360},100%,50%)`;
-div.style.left=Math.random()*window.innerWidth+'px';
-div.style.animationDuration=2+Math.random()*2+'s';
-document.body.appendChild(div);
-setTimeout(()=>div.remove(),3000);
-}
-}
-
-function checkGoal(total){
-if(total>=goalAmount){awardBadge('Goal Achiever');}
-}
+// GAMIFICATION
+function addXP(amount){xp+=amount;while(xp>=level*50){xp-=level*50;level++;awardBadge('Level Up');showConfetti();}updateDashboard();}
+function awardBadge(name){if(!badges.includes(name)){badges.push(name);showConfetti();}}
+function displayBadges(){let container=document.getElementById('badges'); container.innerHTML=''; badges.forEach(b=>{let span=document.createElement('span');span.className='badge';span.textContent=b;container.appendChild(span);});}
+function showConfetti(){for(let i=0;i<50;i++){let div=document.createElement('div'); div.className='confetti'; div.style.backgroundColor=`hsl(${Math.random()*360},100%,50%)`; div.style.left=Math.random()*window.innerWidth+'px'; div.style.animationDuration=2+Math.random()*2+'s'; document.body.appendChild(div); setTimeout(()=>div.remove(),3000);}}
+function checkGoal(total){if(total>=goalAmount){awardBadge('Goal Achiever');}}
 
 renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis(); displayBadges();
 </script>
+
 </body>
 </html>
