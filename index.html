@@ -450,7 +450,15 @@ function init(){
 init();
 
 /* redraw charts on resize/orientation change */
-window.addEventListener('resize', () => { try{ updateCharts(); }catch{} });
+window.addEventListener('resize', () => {
+  try {
+    updateCharts();
+  } catch (err) {
+    console.warn('Chart redraw error:', err);
+  }
+});
+
 </script>
 </body>
 </html>
+
