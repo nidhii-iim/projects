@@ -206,6 +206,41 @@ const mobileNavLinks = document.querySelectorAll('.mobile-nav a');
 const mobileNav = document.getElementById('mobile-nav');
 document.getElementById('hamburger').addEventListener('click', ()=>mobileNav.classList.toggle('show'));
 
+  document.addEventListener('DOMContentLoaded', ()=>{
+  const navLinks = document.querySelectorAll('.nav-link');
+  const mobileNavLinks = document.querySelectorAll('.mobile-nav a');
+  const sections = document.querySelectorAll('main section');
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobile-nav');
+
+  function showSection(id){
+    sections.forEach(s=>s.classList.remove('active'));
+    const section = document.getElementById(id);
+    if(section) section.classList.add('active');
+
+    navLinks.forEach(a=>a.classList.toggle('active', a.dataset.section===id));
+    mobileNavLinks.forEach(a=>a.classList.toggle('active', a.dataset.section===id));
+    mobileNav.classList.remove('show');
+
+    // redraw charts or update dashboard if needed
+    if(id==='dashboard') updateDashboard();
+    if(id==='reports') setTimeout(updateCharts, 50);
+    if(id==='emotions') setTimeout(updateEmotionAnalysis, 50);
+  }
+
+  navLinks.forEach(a=>{
+    a.addEventListener('click', ()=> showSection(a.dataset.section));
+  });
+  mobileNavLinks.forEach(a=>{
+    a.addEventListener('click', ()=> showSection(a.dataset.section));
+  });
+
+  hamburger.addEventListener('click', ()=> mobileNav.classList.toggle('show'));
+
+  // initialize default view
+  showSection('dashboard');
+});
+
 function showSection(id){
   sections.forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -388,3 +423,4 @@ render();
 </script>
 </body>
 </html>
+
