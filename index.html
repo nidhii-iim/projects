@@ -3,54 +3,37 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Premium Mobile Budget Tracker</title>
+<title>Premium Mobile Budget Tracker — Fixed</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   /* ---------- BASE ---------- */
   :root{
-    --bg1:#0f1724;
-    --accent1:#4a90e2;
-    --accent2:#50e3c2;
-    --glass: rgba(255,255,255,0.08);
-    --glass-strong: rgba(255,255,255,0.14);
-    --muted: rgba(255,255,255,0.75);
-    --success: #2ecc71;
-    --danger: #e74c3c;
+    --bg1:#0f1724; --accent1:#4a90e2; --accent2:#50e3c2;
+    --glass: rgba(255,255,255,0.08); --glass-strong: rgba(255,255,255,0.14);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0;
-    font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    margin:0; font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial;
     background: linear-gradient(120deg,var(--bg1) 0%, #122233 60%, #0b2233 100%);
-    color: #fff;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    overflow-y:auto;
+    color: #fff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   }
 
-  /* ---------- REALISTIC BACKGROUND: subtle wave + vignette + particles ---------- */
-  /* gentle animated SVG wave (keeps lightweight) */
+  /* ---------- BACKGROUND ---------- */
   .bg-wrap{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
   .bg-wave{position:absolute;left:50%;transform:translateX(-50%);bottom:-10vh;width:160vw;height:60vh;opacity:0.12;filter:blur(22px)}
   .bg-vignette{position:fixed;inset:0;background:radial-gradient(1000px 600px at 10% 10%, rgba(255,255,255,0.02), transparent 10%), radial-gradient(900px 500px at 90% 90%, rgba(255,255,255,0.02), transparent 12%);pointer-events:none;z-index:0}
-  /* particles: few, slow */
   .particles{position:fixed;inset:0;z-index:0;pointer-events:none}
   .particle{position:absolute;border-radius:50%;opacity:0.06;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.1));animation:float 22s linear infinite}
   @keyframes float{0%{transform:translateY(100vh) translateX(0) scale(.6)}50%{transform:translateY(40vh) translateX(30vw) scale(1)}100%{transform:translateY(-10vh) translateX(60vw) scale(.6)}}
 
   /* ---------- LAYOUT ---------- */
   .app {position:relative;z-index:1;max-width:980px;margin:0 auto;padding:14px 16px 72px;}
-  header{display:flex;align-items:center;justify-content:space-between;gap:12px; margin-bottom:10px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
   .brand{display:flex;gap:12px;align-items:center}
-  .logo{
-    width:44px;height:44px;border-radius:12px;
-    background:linear-gradient(135deg,var(--accent1),var(--accent2));
-    display:flex;align-items:center;justify-content:center;font-weight:700;color:#062433;box-shadow:0 6px 18px rgba(0,0,0,0.4)
-  }
+  .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#062433;box-shadow:0 6px 18px rgba(0,0,0,0.4)}
   h1{font-size:1.05rem;margin:0}
-  /* hamburger */
   .menu-btn{display:none;flex-direction:column;gap:4px;padding:8px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.02);cursor:pointer}
   .menu-btn span{width:20px;height:2px;background:linear-gradient(90deg,#fff,rgba(255,255,255,0.8));display:block;border-radius:2px}
 
@@ -58,268 +41,161 @@
   nav a{padding:8px 12px;border-radius:12px;text-decoration:none;color:rgba(255,255,255,0.9);font-weight:600;cursor:pointer}
   nav a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#052a34;box-shadow:0 8px 26px rgba(74,144,226,0.14)}
 
-  /* ---------- GRID & CARDS ---------- */
   .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
-  .card{
-    background:var(--glass);
-    border-radius:14px;padding:12px;
-    box-shadow: 0 6px 18px rgba(2,6,23,0.45);
-    backdrop-filter: blur(8px);
-    border:1px solid rgba(255,255,255,0.03);
-    transition:transform .22s, box-shadow .22s;
-  }
+  .card{background:var(--glass);border-radius:14px;padding:12px;box-shadow: 0 6px 18px rgba(2,6,23,0.45);backdrop-filter: blur(8px);border:1px solid rgba(255,255,255,0.03);transition:transform .22s, box-shadow .22s}
   .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,23,0.6)}
   .card h3{margin:0;font-size:0.9rem;font-weight:600;color:#e6f7ff}
   .card .value{font-weight:700;font-size:1.15rem;margin-top:6px;color:#fff}
-
-  /* progress small */
   .progress{height:10px;background:rgba(255,255,255,0.06);border-radius:999px;margin-top:8px;overflow:hidden}
   .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .8s ease}
 
-  /* content area */
   .section{margin-top:8px}
-  .panel{
-    background:var(--glass-strong);border-radius:14px;padding:12px;
-    box-shadow:0 12px 28px rgba(2,6,23,0.45);
-    border:1px solid rgba(255,255,255,0.04);
-  }
+  .panel{background:var(--glass-strong);border-radius:14px;padding:12px;box-shadow:0 12px 28px rgba(2,6,23,0.45);border:1px solid rgba(255,255,255,0.04)}
 
-  /* form styles (mobile-friendly full width) */
   form{display:flex;flex-direction:column;gap:10px}
   .row{display:flex;gap:8px;align-items:center}
   .row .half{flex:1}
-  input[type=text], input[type=number], input[type=date], select{
-    width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);
-    background:rgba(0,0,0,0.12);color:#fff;font-size:14px;
-  }
-  button.primary{
-    padding:12px 16px;border-radius:999px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));
-    color:#062433;font-weight:700;cursor:pointer;box-shadow:0 10px 30px rgba(74,144,226,0.12);
-  }
+  input[type=text], input[type=number], input[type=date], select{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.12);color:#fff;font-size:14px}
+  button.primary{padding:12px 16px;border-radius:999px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#062433;font-weight:700;cursor:pointer}
   button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#fff;padding:10px 12px;border-radius:10px}
 
-  /* expense list */
   ul.expense-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
-  li.expense{
-    display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border-radius:10px;background:rgba(0,0,0,0.16);
-    border:1px solid rgba(255,255,255,0.03)
-  }
+  li.expense{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border-radius:10px;background:rgba(0,0,0,0.16);border:1px solid rgba(255,255,255,0.03)}
   .meta{display:flex;flex-direction:column;gap:4px}
   .meta .name{font-weight:600}
   .meta .small{font-size:12px;color:rgba(255,255,255,0.75)}
 
-  /* charts container horizontal scroll on mobile */
   .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .chart-wrap{min-width:280px;border-radius:12px;overflow:hidden}
 
-  /* challenge popup */
-  #challenge-popup{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:1200;display:none;padding:14px;border-radius:14px;background:linear-gradient(180deg,#ffffff, #f7f7f7);color:#112;box-shadow:0 18px 40px rgba(2,6,23,0.6)}
-
-  /* small confetti shapes */
+  #challenge-popup{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:1200;display:none;padding:14px;border-radius:14px;background:linear-gradient(180deg,#ffffff,#f7f7f7);color:#112;box-shadow:0 18px 40px rgba(2,6,23,0.6)}
   .confetti{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:1200;opacity:0.95}
 
-  /* responsiveness for mobile */
-  @media (max-width:900px){
-    .cards{grid-template-columns:repeat(2,1fr)}
-    .charts{grid-template-columns:1fr}
-  }
+  @media (max-width:900px){ .cards{grid-template-columns:repeat(2,1fr)} .charts{grid-template-columns:1fr} }
   @media (max-width:520px){
-    .brand h1{display:none}
-    .menu-btn{display:flex}
-    nav{display:none}
-    .cards{grid-template-columns:1fr}
-    .app{padding:12px}
-    .chart-wrap{min-width:320px}
+    .brand h1{display:none} .menu-btn{display:flex} nav{display:none}
+    .cards{grid-template-columns:1fr} .app{padding:12px} .chart-wrap{min-width:320px}
   }
-
-  /* hamburger open nav mobile */
   .mobile-nav{position:fixed;top:68px;left:8px;right:8px;background:var(--glass);backdrop-filter:blur(8px);border-radius:12px;padding:8px;display:none;z-index:150}
   .mobile-nav a{display:block;padding:10px;border-radius:8px;color:#eaf7ff}
   .mobile-nav.show{display:block}
-
-  /* fine touch targets */
-  button, a {touch-action:manipulation}
 </style>
 </head>
 <body>
-
-<!-- realistic background -->
-<div class="bg-wrap">
-  <svg class="bg-wave" viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a90e2"/><stop offset="1" stop-color="#50e3c2"/></linearGradient></defs>
-    <path d="M0,200 C150,120 350,40 600,60 C850,80 1050,160 1200,140 L1200 200 L0 200 Z" fill="url(#g1)"/>
-  </svg>
-  <div class="bg-vignette"></div>
-  <div class="particles" aria-hidden="true">
-    <div class="particle" style="width:22px;height:22px;left:6%;top:30%;animation-duration:32s"></div>
-    <div class="particle" style="width:30px;height:30px;left:82%;top:60%;animation-duration:26s"></div>
-    <div class="particle" style="width:16px;height:16px;left:48%;top:12%;animation-duration:28s"></div>
-  </div>
-</div>
-
-<div class="app" role="application" aria-label="Budget tracker app">
-  <header>
-    <div class="brand">
-      <div class="logo">BT</div>
-      <div>
-        <h1>Budget Tracker</h1>
-        <div style="font-size:12px;color:rgba(255,255,255,0.75)">Smart • Gamified • Emotion-aware</div>
-      </div>
+  <!-- realistic background -->
+  <div class="bg-wrap" aria-hidden="true">
+    <svg class="bg-wave" viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a90e2"/><stop offset="1" stop-color="#50e3c2"/></linearGradient></defs>
+      <path d="M0,200 C150,120 350,40 600,60 C850,80 1050,160 1200,140 L1200 200 L0 200 Z" fill="url(#g1)"/>
+    </svg>
+    <div class="bg-vignette"></div>
+    <div class="particles" aria-hidden="true">
+      <div class="particle" style="width:22px;height:22px;left:6%;top:30%;animation-duration:32s"></div>
+      <div class="particle" style="width:30px;height:30px;left:82%;top:60%;animation-duration:26s"></div>
+      <div class="particle" style="width:16px;height:16px;left:48%;top:12%;animation-duration:28s"></div>
     </div>
-
-    <!-- hamburger (mobile) -->
-    <div style="display:flex;align-items:center;gap:8px">
-      <button class="menu-btn" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-      <nav id="main-nav" aria-label="Main navigation">
-        <a onclick="showSection('dashboard')" class="active">Dashboard</a>
-        <a onclick="showSection('add-expense')">Add</a>
-        <a onclick="showSection('reports')">Reports</a>
-        <a onclick="showSection('emotions')">Emotions</a>
-        <a onclick="showSection('settings')">Settings</a>
-      </nav>
-    </div>
-  </header>
-
-  <!-- mobile nav -->
-  <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
-    <a onclick="mobileNavGo('dashboard')">Dashboard</a>
-    <a onclick="mobileNavGo('add-expense')">Add Expense</a>
-    <a onclick="mobileNavGo('reports')">Reports</a>
-    <a onclick="mobileNavGo('emotions')">Emotions</a>
-    <a onclick="mobileNavGo('settings')">Settings</a>
   </div>
 
-  <!-- CONTENT -->
-  <main>
-    <!-- DASHBOARD -->
-    <section id="dashboard" class="section active" aria-labelledby="dashboard">
-      <div class="cards" role="region" aria-label="summary cards">
-        <div class="card">
-          <h3>Total Budget</h3>
-          <div class="value" id="total-budget">₹0</div>
-        </div>
-        <div class="card">
-          <h3>Total Expense</h3>
-          <div class="value" id="total-expense">₹0</div>
-        </div>
-        <div class="card">
-          <h3>Remaining</h3>
-          <div class="value" id="remaining-budget">₹0</div>
-          <div class="progress"><i id="progress-fill"></i></div>
-        </div>
-        <div class="card">
-          <h3>Level <small style="color:rgba(255,255,255,0.8)">(points)</small></h3>
-          <div class="value" id="level">1</div>
-          <div class="progress"><i id="level-fill"></i></div>
-          <div id="badges" style="margin-top:8px"></div>
-          <div style="margin-top:6px;color:rgba(255,255,255,0.9)" id="streak">Streak: 0 days</div>
-        </div>
+  <div class="app" role="application" aria-label="Budget tracker app">
+    <header>
+      <div class="brand">
+        <div class="logo">BT</div>
+        <div><h1>Budget Tracker</h1><div style="font-size:12px;color:rgba(255,255,255,0.75)">Smart • Gamified • Emotion-aware</div></div>
       </div>
 
-      <div class="section">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="menu-btn" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+        <nav id="main-nav" aria-label="Main navigation">
+          <a data-section="dashboard" class="nav-link active">Dashboard</a>
+          <a data-section="add-expense" class="nav-link">Add</a>
+          <a data-section="reports" class="nav-link">Reports</a>
+          <a data-section="emotions" class="nav-link">Emotions</a>
+          <a data-section="settings" class="nav-link">Settings</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+      <a data-section="dashboard">Dashboard</a>
+      <a data-section="add-expense">Add Expense</a>
+      <a data-section="reports">Reports</a>
+      <a data-section="emotions">Emotions</a>
+      <a data-section="settings">Settings</a>
+    </div>
+
+    <main>
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="section active" aria-labelledby="dashboard">
+        <div class="cards" role="region" aria-label="summary cards">
+          <div class="card"><h3>Total Budget</h3><div class="value" id="total-budget">₹0</div></div>
+          <div class="card"><h3>Total Expense</h3><div class="value" id="total-expense">₹0</div></div>
+          <div class="card"><h3>Remaining</h3><div class="value" id="remaining-budget">₹0</div><div class="progress"><i id="progress-fill"></i></div></div>
+          <div class="card"><h3>Level</h3><div class="value" id="level">1</div><div class="progress"><i id="level-fill"></i></div><div id="badges" style="margin-top:8px"></div><div style="margin-top:6px;color:rgba(255,255,255,0.9)" id="streak">Streak: 0 days</div></div>
+        </div>
+
+        <div class="section"><div class="panel"><h3 style="margin-top:0">Recent</h3><ul id="recent-expenses" class="expense-list" aria-live="polite"></ul></div></div>
+
+        <div class="cards" style="margin-top:12px">
+          <div class="card"><h3>Savings Goal</h3><div class="value" id="goal-progress">₹0 / ₹0</div><div class="progress"><i id="goal-fill"></i></div></div>
+          <div class="card"><h3>Top Category</h3><div class="value" id="top-category">-</div></div>
+        </div>
+      </section>
+
+      <!-- ADD -->
+      <section id="add-expense" class="section" aria-labelledby="add-expense">
         <div class="panel">
-          <h3 style="margin-top:0">Recent</h3>
-          <ul id="recent-expenses" class="expense-list" aria-live="polite"></ul>
-        </div>
-      </div>
+          <h3 style="margin-top:0">Add Expense</h3>
+          <form id="expense-form" autocomplete="off">
+            <input id="name" type="text" placeholder="Expense name" required>
+            <div class="row">
+              <input id="amount" type="number" placeholder="Amount (₹)" required class="half">
+              <input id="date" type="date" placeholder="Date" required class="half">
+            </div>
+            <div class="row">
+              <select id="category" required class="half"><option value="">Category</option><option>Food</option><option>Transport</option><option>Shopping</option><option>Utilities</option><option>Others</option></select>
+              <select id="emotion" required class="half"><option value="">Emotion</option><option>Happy</option><option>Sad</option><option>Stressed</option><option>Excited</option><option>Angry</option></select>
+            </div>
+            <button class="primary" type="submit">Add Expense</button>
+          </form>
 
-      <div class="cards" style="margin-top:12px">
-        <div class="card">
-          <h3>Savings Goal</h3>
-          <div class="value" id="goal-progress">₹0 / ₹0</div>
-          <div class="progress"><i id="goal-fill"></i></div>
-        </div>
-        <div class="card">
-          <h3>Top Category</h3>
-          <div class="value" id="top-category">-</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ADD -->
-    <section id="add-expense" class="section" aria-labelledby="add-expense">
-      <div class="panel">
-        <h3 style="margin-top:0">Add Expense</h3>
-        <form id="expense-form" autocomplete="off">
-          <input id="name" type="text" placeholder="Expense name" required>
-          <div class="row">
-            <input id="amount" type="number" placeholder="Amount (₹)" required class="half">
-            <input id="date" type="date" placeholder="Date" required class="half">
+          <div style="margin-top:10px">
+            <input id="search-expense" type="text" placeholder="Search expenses (name, category, emotion)..." style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%;background:transparent;color:#fff">
           </div>
-          <div class="row">
-            <select id="category" required class="half">
-              <option value="">Category</option>
-              <option>Food</option><option>Transport</option><option>Shopping</option><option>Utilities</option><option>Others</option>
-            </select>
-            <select id="emotion" required class="half">
-              <option value="">Emotion</option>
-              <option>Happy</option><option>Sad</option><option>Stressed</option><option>Excited</option><option>Angry</option>
-            </select>
-          </div>
-          <button class="primary" type="submit">Add Expense</button>
-        </form>
 
-        <div style="margin-top:10px">
-          <input id="search-expense" type="text" placeholder="Search expenses (name, category, emotion)..." style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%;background:transparent;color:#fff">
+          <div style="margin-top:12px"><ul id="expense-list" class="expense-list" aria-live="polite"></ul></div>
         </div>
+      </section>
 
-        <div style="margin-top:12px">
-          <ul id="expense-list" class="expense-list" aria-live="polite"></ul>
+      <!-- REPORTS -->
+      <section id="reports" class="section" aria-labelledby="reports">
+        <div class="charts" style="margin-bottom:12px">
+          <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">By Category</h3><canvas id="categoryChart"></canvas></div>
+          <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">Monthly</h3><canvas id="monthlyChart"></canvas></div>
         </div>
-      </div>
-    </section>
+        <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">Emotion Distribution</h3><canvas id="emotionChart"></canvas></div>
+      </section>
 
-    <!-- REPORTS -->
-    <section id="reports" class="section" aria-labelledby="reports">
-      <div class="charts" style="margin-bottom:12px">
-        <div class="chart-wrap chart-container panel">
-          <h3 style="margin-top:0">By Category</h3>
-          <canvas id="categoryChart" style="max-width:100%"></canvas>
+      <!-- EMOTIONS -->
+      <section id="emotions" class="section" aria-labelledby="emotions">
+        <div class="panel"><h3 style="margin-top:0">Emotion Insights</h3><p id="emotion-insight" style="font-weight:600;color:#eaf7ff">No data yet — add expenses with emotions.</p></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="settings" class="section" aria-labelledby="settings">
+        <div class="panel">
+          <h3 style="margin-top:0">Settings</h3>
+          <form id="budget-form">
+            <input id="new-budget" type="number" placeholder="Set total budget (₹)" required>
+            <input id="goal-amount" type="number" placeholder="Set savings goal (₹)" required>
+            <div style="display:flex;gap:8px;margin-top:6px"><button class="primary" type="submit">Save Budget & Goal</button><button class="ghost" id="export-btn" type="button">Export CSV</button></div>
+          </form>
+          <div style="margin-top:12px;display:flex;gap:8px"><button class="ghost" id="reset-btn">Reset All Data</button></div>
         </div>
-        <div class="chart-wrap chart-container panel">
-          <h3 style="margin-top:0">Monthly</h3>
-          <canvas id="monthlyChart" style="max-width:100%"></canvas>
-        </div>
-      </div>
-      <div class="chart-wrap chart-container panel">
-        <h3 style="margin-top:0">Emotion Distribution</h3>
-        <canvas id="emotionChart"></canvas>
-      </div>
-    </section>
+      </section>
+    </main>
+  </div>
 
-    <!-- EMOTIONS -->
-    <section id="emotions" class="section" aria-labelledby="emotions">
-      <div class="panel">
-        <h3 style="margin-top:0">Emotion Insights</h3>
-        <p id="emotion-insight" style="font-weight:600;color:#eaf7ff">No data yet — add expenses with emotions.</p>
-      </div>
-    </section>
-
-    <!-- SETTINGS -->
-    <section id="settings" class="section" aria-labelledby="settings">
-      <div class="panel">
-        <h3 style="margin-top:0">Settings</h3>
-        <form id="budget-form">
-          <input id="new-budget" type="number" placeholder="Set total budget (₹)" required>
-          <input id="goal-amount" type="number" placeholder="Set savings goal (₹)" required>
-          <div style="display:flex;gap:8px;margin-top:6px">
-            <button class="primary" type="submit">Save Budget & Goal</button>
-            <button class="ghost" id="export-btn" type="button">Export CSV</button>
-          </div>
-        </form>
-        <div style="margin-top:12px;display:flex;gap:8px">
-          <button class="ghost" id="reset-btn">Reset All Data</button>
-        </div>
-      </div>
-    </section>
-  </main>
-</div>
-
-<!-- Challenge popup -->
-<div id="challenge-popup" role="dialog" aria-modal="true">
-  <div id="challenge-text" style="font-weight:700"></div>
-  <div style="margin-top:12px;text-align:center"><button onclick="closeChallenge()" class="primary">Got it</button></div>
-</div>
+  <div id="challenge-popup" role="dialog" aria-modal="true"><div id="challenge-text" style="font-weight:700"></div><div style="margin-top:12px;text-align:center"><button onclick="closeChallenge()" class="primary">Got it</button></div></div>
 
 <script>
 /* -------------------------
@@ -333,22 +209,19 @@ let lastDate = localStorage.getItem('lastDate') || null;
 let points = parseInt(localStorage.getItem('points')) || 0;
 
 /* ---------- UI helpers ---------- */
-const fmt = v => typeof v==='number' ? v.toLocaleString() : v;
+const fmt = v => (typeof v === 'number' ? v.toLocaleString() : v);
 
-/* ---------- Navigation (mobile hamburger) ---------- */
-const hamburger = document.getElementById('hamburger');
-const mobileNav = document.getElementById('mobile-nav');
-hamburger && hamburger.addEventListener('click', () => mobileNav.classList.toggle('show'));
-function mobileNavGo(id){
-  showSection(id);
-  mobileNav.classList.remove('show');
-}
+/* ---------- NAV behaviour ---------- */
+document.querySelectorAll('.nav-link').forEach(a=>{
+  a.addEventListener('click', ()=> showSection(a.dataset.section));
+});
+document.querySelectorAll('.mobile-nav a').forEach(a=>{
+  a.addEventListener('click', ()=> { showSection(a.dataset.section); document.getElementById('mobile-nav').classList.remove('show'); });
+});
+document.getElementById('hamburger').addEventListener('click', ()=> document.getElementById('mobile-nav').classList.toggle('show'));
 
-/* set active nav styling */
 function setActiveNav(id){
-  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-  const match = Array.from(document.querySelectorAll('nav a')).find(a => a.textContent.trim().toLowerCase().startsWith(id.replace('-','')));
-  if(match) match.classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(a => a.classList.toggle('active', a.dataset.section === id));
 }
 
 /* ---------- Sections ---------- */
@@ -358,10 +231,12 @@ function showSection(id){
   if(!el) return;
   el.classList.add('active');
   setActiveNav(id);
-  // run updates for visible section
-  if(id === 'dashboard') updateDashboard();
-  if(id === 'reports') updateCharts();
-  if(id === 'emotions') updateEmotionAnalysis();
+  // small delay before heavy redraws (charts) so layout is updated
+  if(id === 'reports'){
+    setTimeout(()=>{ try { updateCharts(); } catch(err){ console.error(err); } }, 80);
+  }
+  if(id === 'emotions') setTimeout(updateEmotionAnalysis, 60);
+  if(id === 'dashboard') setTimeout(updateDashboard, 40);
 }
 
 /* ---------- Save / Load ---------- */
@@ -378,33 +253,20 @@ function saveData(){
 function renderExpenses(){
   const list = document.getElementById('expense-list');
   const recent = document.getElementById('recent-expenses');
-  list.innerHTML = '';
-  recent.innerHTML = '';
-  // newest first
+  list.innerHTML = ''; recent.innerHTML = '';
   expenses.slice().reverse().forEach((e, idx) => {
-    const li = document.createElement('li');
-    li.className = 'expense';
+    const li = document.createElement('li'); li.className = 'expense';
     li.innerHTML = `<div class="meta"><div class="name">${escapeHtml(e.name)} • ₹${fmt(e.amount)}</div><div class="small">${e.date} • ${escapeHtml(e.category)} • ${escapeHtml(e.emotion)}</div></div>
       <div style="display:flex;gap:8px;align-items:center"><div style="font-weight:700;color:#fff">₹${fmt(e.amount)}</div>
       <button class="delete-btn" aria-label="Delete expense">Delete</button></div>`;
     li.querySelector('.delete-btn').addEventListener('click', () => {
       const originalIndex = expenses.indexOf(e);
-      if (originalIndex > -1) {
-        expenses.splice(originalIndex, 1);
-        saveData(); renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();
-      }
+      if (originalIndex > -1) { expenses.splice(originalIndex, 1); saveData(); renderExpenses(); updateDashboard(); try{ updateCharts(); }catch{} updateEmotionAnalysis(); }
     });
     list.appendChild(li);
-    // add to recent (limited)
-    if(idx < 5){
-      const li2 = li.cloneNode(true);
-      li2.querySelector('.delete-btn').remove();
-      recent.appendChild(li2);
-    }
+    if(idx < 5){ const li2 = li.cloneNode(true); const btn = li2.querySelector('.delete-btn'); if(btn) btn.remove(); recent.appendChild(li2); }
   });
 }
-
-/* simple escape for plain text insertion */
 function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* ---------- Dashboard updates ---------- */
@@ -414,141 +276,101 @@ function updateDashboard(){
   document.getElementById('total-expense').textContent = `₹${fmt(totalExpense)}`;
   const remaining = totalBudget - totalExpense;
   document.getElementById('remaining-budget').textContent = `₹${fmt(remaining)}`;
-  // progress fill
   const progressPct = totalBudget>0 ? Math.min(100, Math.round(totalExpense/totalBudget*100)) : 0;
   document.getElementById('progress-fill').style.width = progressPct + '%';
 
-  // points & level
-  points = Math.floor(totalExpense/100); // 1 point per 100 spent
+  points = Math.floor(totalExpense/100);
   const level = Math.floor(points/10)+1;
   document.getElementById('level').textContent = level;
   document.getElementById('level-fill').style.width = Math.min(100, (points%10)*10) + '%';
-  // badges
+
   const badges = [];
   if(points >= 20) badges.push('Saver');
   if(points >= 50) badges.push('Budget Master');
   if(points >= 100) badges.push('Finance Guru');
   const badgesEl = document.getElementById('badges'); badgesEl.innerHTML = '';
-  badges.forEach(b => {
-    const sp = document.createElement('span'); sp.className = 'badge'; sp.textContent = b + ' 🏆'; badgesEl.appendChild(sp);
-  });
+  badges.forEach(b => { const sp = document.createElement('span'); sp.className = 'badge'; sp.textContent = b + ' 🏆'; badgesEl.appendChild(sp); });
+
   if(badges.length) createConfettiSmall();
 
-  // streak logic: increment if new day called by updateDashboard
   const today = new Date().toISOString().split('T')[0];
-  if(lastDate === today){
-    // already counted today
-  } else {
+  if(lastDate === today){}
+  else {
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    if(lastDate === yesterday) streakDays++;
-    else streakDays = 1;
-    lastDate = today;
-    saveData();
+    if(lastDate === yesterday) streakDays++; else streakDays = 1;
+    lastDate = today; saveData();
   }
   document.getElementById('streak').textContent = `Streak: ${streakDays} days`;
 
-  // goal
   document.getElementById('goal-progress').textContent = `₹${fmt(totalExpense)} / ₹${fmt(goalAmount)}`;
   const goalPct = goalAmount>0 ? Math.min(100, Math.round(totalExpense/goalAmount*100)) : 0;
   document.getElementById('goal-fill').style.width = goalPct + '%';
 
-  // top category
   const catTotals = {};
   expenses.forEach(e => catTotals[e.category] = (catTotals[e.category]||0) + Number(e.amount||0));
   let topCat = '-';
-  if(Object.keys(catTotals).length){
-    topCat = Object.keys(catTotals).reduce((a,b)=> catTotals[a] >= catTotals[b] ? a : b);
-  }
+  if(Object.keys(catTotals).length) topCat = Object.keys(catTotals).reduce((a,b)=> catTotals[a] >= catTotals[b] ? a : b);
   document.getElementById('top-category').textContent = topCat;
 }
 
 /* ---------- Charts (Chart.js) ---------- */
 let categoryChart=null, monthlyChart=null, emotionChart=null;
 function updateCharts(){
-  // category
-  const catMap = {}; expenses.forEach(e => { catMap[e.category] = (catMap[e.category]||0) + Number(e.amount||0); });
-  const catLabels = Object.keys(catMap), catData = Object.values(catMap);
+  try {
+    const catMap = {}; expenses.forEach(e => { catMap[e.category] = (catMap[e.category]||0) + Number(e.amount||0); });
+    const catLabels = Object.keys(catMap), catData = Object.values(catMap);
 
-  // monthly
-  const mon = {};
-  expenses.forEach(e => {
-    const m = e.date ? e.date.substring(0,7) : new Date().toISOString().slice(0,7);
-    mon[m] = (mon[m]||0) + Number(e.amount||0);
-  });
-  const monthLabels = Object.keys(mon).sort(), monthData = monthLabels.map(l => mon[l]);
+    const mon = {};
+    expenses.forEach(e => { const m = e.date ? e.date.substring(0,7) : new Date().toISOString().slice(0,7); mon[m] = (mon[m]||0) + Number(e.amount||0); });
+    const monthLabels = Object.keys(mon).sort(), monthData = monthLabels.map(l => mon[l]);
 
-  // emotions
-  const emo = {}; expenses.forEach(e=> emo[e.emotion] = (emo[e.emotion]||0) + Number(e.amount||0));
-  const emoLabels = Object.keys(emo), emoData = Object.values(emo);
+    const emo = {}; expenses.forEach(e=> emo[e.emotion] = (emo[e.emotion]||0) + Number(e.amount||0));
+    const emoLabels = Object.keys(emo), emoData = Object.values(emo);
 
-  // destroy previous charts
-  if(categoryChart) categoryChart.destroy();
-  if(monthlyChart) monthlyChart.destroy();
-  if(emotionChart) emotionChart.destroy();
+    if(categoryChart) categoryChart.destroy();
+    if(monthlyChart) monthlyChart.destroy();
+    if(emotionChart) emotionChart.destroy();
 
-  const ctx1 = document.getElementById('categoryChart').getContext('2d');
-  categoryChart = new Chart(ctx1, {
-    type:'pie',
-    data:{labels:catLabels, datasets:[{data:catData, backgroundColor:['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db']}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}
-  });
+    const ctx1 = document.getElementById('categoryChart').getContext('2d');
+    categoryChart = new Chart(ctx1, { type:'pie', data:{ labels:catLabels, datasets:[{data:catData, backgroundColor:['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db']}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}} });
 
-  const ctx2 = document.getElementById('monthlyChart').getContext('2d');
-  monthlyChart = new Chart(ctx2, {
-    type:'bar',
-    data:{labels:monthLabels, datasets:[{label:'Expenses', data:monthData, backgroundColor:'#50e3c2'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
-  });
+    const ctx2 = document.getElementById('monthlyChart').getContext('2d');
+    monthlyChart = new Chart(ctx2, { type:'bar', data:{ labels:monthLabels, datasets:[{label:'Expenses', data:monthData, backgroundColor:'#50e3c2'}] }, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}} });
 
-  const ctx3 = document.getElementById('emotionChart').getContext('2d');
-  emotionChart = new Chart(ctx3, {
-    type:'doughnut',
-    data:{labels:emoLabels, datasets:[{data:emoData, backgroundColor:['#f5a623','#e74c3c','#9b59b6','#2ecc71','#3498db']}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}
-  });
+    const ctx3 = document.getElementById('emotionChart').getContext('2d');
+    emotionChart = new Chart(ctx3, { type:'doughnut', data:{ labels:emoLabels, datasets:[{data:emoData, backgroundColor:['#f5a623','#e74c3c','#9b59b6','#2ecc71','#3498db']}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}} });
 
-  // ensure canvases sized nicely on small screens:
-  [document.getElementById('categoryChart'), document.getElementById('monthlyChart'), document.getElementById('emotionChart')].forEach(c => {
-    c.style.height = '240px';
-  });
+    [document.getElementById('categoryChart'), document.getElementById('monthlyChart'), document.getElementById('emotionChart')].forEach(c=>{ if(c) c.style.height='240px'; });
+  } catch(err) {
+    console.error('Chart error', err);
+  }
 }
 
 /* ---------- Emotion insight ---------- */
 function updateEmotionAnalysis(){
-  const emoMoney = {};
-  expenses.forEach(e => emoMoney[e.emotion] = (emoMoney[e.emotion]||0) + Number(e.amount||0));
+  const emoMoney = {}; expenses.forEach(e => emoMoney[e.emotion] = (emoMoney[e.emotion]||0) + Number(e.amount||0));
   let maxE = null, maxV = 0;
   for(const k in emoMoney){ if(emoMoney[k] > maxV){ maxV = emoMoney[k]; maxE = k; } }
   const insight = maxE ? `💡 You spend most when you feel ${maxE} (₹${fmt(maxV)}).` : 'Add expenses with emotions to see insights.';
   document.getElementById('emotion-insight').textContent = insight;
 }
 
-/* ---------- Challenges & Confetti ---------- */
+/* ---------- Challenges & confetti ---------- */
 function runChallenge(expense){
+  if(!expense) return;
   const popup = document.getElementById('challenge-popup');
   const txt = document.getElementById('challenge-text');
-  if(expense.amount > 5000){
-    txt.textContent = "💰 Big spending alert — consider reviewing this purchase.";
-    popup.style.display = 'block'; createConfettiBurst();
-  } else if(expense.emotion === 'Stressed' && expense.amount > 500){
-    txt.textContent = "⚠️ Spent while stressed — try a calming activity instead of impulse buying.";
-    popup.style.display = 'block'; createConfettiBurst();
-  } else if(expense.emotion === 'Excited' && expense.amount > 1000){
-    txt.textContent = "🎉 Large spend while excited — nice treat! consider setting a saving next.";
-    popup.style.display = 'block'; createConfettiBurst();
-  }
+  if(expense.amount > 5000){ txt.textContent = "💰 Big spending alert — consider reviewing this purchase."; popup.style.display = 'block'; createConfettiBurst(); }
+  else if(expense.emotion === 'Stressed' && expense.amount > 500){ txt.textContent = "⚠️ Spent while stressed — try a calming activity instead of impulse buying."; popup.style.display = 'block'; createConfettiBurst(); }
+  else if(expense.emotion === 'Excited' && expense.amount > 1000){ txt.textContent = "🎉 Large spend while excited — nice treat! consider setting a saving next."; popup.style.display = 'block'; createConfettiBurst(); }
 }
 function closeChallenge(){ document.getElementById('challenge-popup').style.display = 'none'; }
 
-/* small confetti (subtle) */
 function createConfettiBurst(){
   for(let i=0;i<18;i++){
-    const c = document.createElement('div');
-    c.className = 'confetti';
-    c.style.left = (10 + Math.random()*80) + '%';
-    c.style.top = (10 + Math.random()*40) + '%';
-    c.style.width = (6 + Math.random()*8) + 'px';
-    c.style.height = c.style.width;
+    const c = document.createElement('div'); c.className = 'confetti';
+    c.style.left = (10 + Math.random()*80) + '%'; c.style.top = (10 + Math.random()*40) + '%';
+    c.style.width = (6 + Math.random()*8) + 'px'; c.style.height = c.style.width;
     c.style.background = ['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db'][Math.floor(Math.random()*5)];
     document.body.appendChild(c);
     const dx = (Math.random()*200)-100, dy = 200 + Math.random()*240;
@@ -556,16 +378,13 @@ function createConfettiBurst(){
     setTimeout(()=>c.remove(),2400);
   }
 }
-
-/* subtle confetti when badge unlocked: smaller */
 function createConfettiSmall(){
   for(let i=0;i<8;i++){
     const c = document.createElement('div'); c.className='confetti';
     c.style.left = (30 + Math.random()*40) + '%'; c.style.top = (10 + Math.random()*30) + '%';
-    c.style.width = '6px'; c.style.height = '6px';
-    c.style.background = ['#f5a623','#f39c12','#50e3c2'][Math.floor(Math.random()*3)];
+    c.style.width = '6px'; c.style.height = '6px'; c.style.background = ['#f5a623','#f39c12','#50e3c2'][Math.floor(Math.random()*3)];
     document.body.appendChild(c);
-    c.animate([{transform:'translateY(0px)', opacity:1},{transform:`translateY(120px)`, opacity:0}], {duration:900+Math.random()*600, easing:'ease-out'});
+    c.animate([{transform:'translateY(0px)', opacity:1},{transform:'translateY(120px)', opacity:0}], {duration:900+Math.random()*600, easing:'ease-out'});
     setTimeout(()=>c.remove(),1600);
   }
 }
@@ -582,16 +401,17 @@ document.getElementById('expense-form').addEventListener('submit', e => {
   const exp = { name, amount, date, category, emotion };
   expenses.push(exp);
   saveData();
-  renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();
+  renderExpenses(); updateDashboard(); setTimeout(()=>{ try{ updateCharts(); }catch{} }, 100);
+  updateEmotionAnalysis();
   runChallenge(exp);
   e.target.reset();
 });
 
 /* ---------- Search ---------- */
 document.getElementById('search-expense').addEventListener('input', e => {
-  const q = e.target.value.toLowerCase();
+  const q = (e.target.value || '').trim().toLowerCase();
   document.querySelectorAll('#expense-list li.expense').forEach(li => {
-    li.style.display = li.textContent.toLowerCase().includes(q) ? 'flex' : 'none';
+    li.style.display = q ? (li.textContent.toLowerCase().includes(q) ? 'flex' : 'none') : 'flex';
   });
 });
 
@@ -610,7 +430,7 @@ document.getElementById('budget-form').addEventListener('submit', e => {
 document.getElementById('reset-btn').addEventListener('click', () => {
   if(!confirm('Reset all app data? This cannot be undone.')) return;
   expenses = []; totalBudget = 50000; goalAmount = 10000; streakDays = 0; lastDate = null; points = 0;
-  saveData(); renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();
+  saveData(); renderExpenses(); updateDashboard(); try{ updateCharts(); }catch{} updateEmotionAnalysis();
 });
 document.getElementById('export-btn').addEventListener('click', () => {
   const header = 'Date,Name,Amount,Category,Emotion\n';
@@ -621,18 +441,16 @@ document.getElementById('export-btn').addEventListener('click', () => {
 });
 function escapeCsv(s){ return `"${(s+'').replace(/"/g,'""')}"`; }
 
-/* ---------- Utilities ---------- */
+/* ---------- Init ---------- */
 function init(){
-  // initial UI updates
-  renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();
-  // mark active nav
+  renderExpenses(); updateDashboard(); setTimeout(()=>{ try{ updateCharts(); }catch(err){ console.warn(err); } }, 150);
+  updateEmotionAnalysis();
   setActiveNav('dashboard');
 }
 init();
 
-/* ---------- helper to ensure charts redraw on orientation change/resized small screens ---------- */
-window.addEventListener('resize', () => { updateCharts(); });
-
+/* redraw charts on resize/orientation change */
+window.addEventListener('resize', () => { try{ updateCharts(); }catch{} });
 </script>
 </body>
 </html>
