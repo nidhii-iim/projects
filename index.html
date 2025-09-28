@@ -3,22 +3,32 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>Premium Mobile Budget Tracker — Ready</title>
+<title>Premium Mobile Budget Tracker — Fixed</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+  /* ---------- BASE ---------- */
   :root{
     --bg1:#0f1724; --accent1:#4a90e2; --accent2:#50e3c2;
     --glass: rgba(255,255,255,0.08); --glass-strong: rgba(255,255,255,0.14);
   }
   *{box-sizing:border-box}
-  html,body{height:100%; margin:0; font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial; background: linear-gradient(120deg,var(--bg1) 0%, #122233 60%, #0b2233 100%); color: #fff;}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+    background: linear-gradient(120deg,var(--bg1) 0%, #122233 60%, #0b2233 100%);
+    color: #fff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* ---------- BACKGROUND ---------- */
   .bg-wrap{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
   .bg-wave{position:absolute;left:50%;transform:translateX(-50%);bottom:-10vh;width:160vw;height:60vh;opacity:0.12;filter:blur(22px)}
   .bg-vignette{position:fixed;inset:0;background:radial-gradient(1000px 600px at 10% 10%, rgba(255,255,255,0.02), transparent 10%), radial-gradient(900px 500px at 90% 90%, rgba(255,255,255,0.02), transparent 12%);pointer-events:none;z-index:0}
   .particles{position:fixed;inset:0;z-index:0;pointer-events:none}
   .particle{position:absolute;border-radius:50%;opacity:0.06;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.1));animation:float 22s linear infinite}
   @keyframes float{0%{transform:translateY(100vh) translateX(0) scale(.6)}50%{transform:translateY(40vh) translateX(30vw) scale(1)}100%{transform:translateY(-10vh) translateX(60vw) scale(.6)}}
+
+  /* ---------- LAYOUT ---------- */
   .app {position:relative;z-index:1;max-width:980px;margin:0 auto;padding:14px 16px 72px;}
   header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
   .brand{display:flex;gap:12px;align-items:center}
@@ -26,9 +36,11 @@
   h1{font-size:1.05rem;margin:0}
   .menu-btn{display:none;flex-direction:column;gap:4px;padding:8px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.02);cursor:pointer}
   .menu-btn span{width:20px;height:2px;background:linear-gradient(90deg,#fff,rgba(255,255,255,0.8));display:block;border-radius:2px}
+
   nav{display:flex;gap:8px;align-items:center}
   nav a{padding:8px 12px;border-radius:12px;text-decoration:none;color:rgba(255,255,255,0.9);font-weight:600;cursor:pointer}
   nav a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#052a34;box-shadow:0 8px 26px rgba(74,144,226,0.14)}
+
   .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
   .card{background:var(--glass);border-radius:14px;padding:12px;box-shadow: 0 6px 18px rgba(2,6,23,0.45);backdrop-filter: blur(8px);border:1px solid rgba(255,255,255,0.03);transition:transform .22s, box-shadow .22s}
   .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,23,0.6)}
@@ -36,34 +48,43 @@
   .card .value{font-weight:700;font-size:1.15rem;margin-top:6px;color:#fff}
   .progress{height:10px;background:rgba(255,255,255,0.06);border-radius:999px;margin-top:8px;overflow:hidden}
   .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .8s ease}
+
   .section{margin-top:8px}
   .panel{background:var(--glass-strong);border-radius:14px;padding:12px;box-shadow:0 12px 28px rgba(2,6,23,0.45);border:1px solid rgba(255,255,255,0.04)}
+
   form{display:flex;flex-direction:column;gap:10px}
   .row{display:flex;gap:8px;align-items:center}
   .row .half{flex:1}
   input[type=text], input[type=number], input[type=date], select{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.12);color:#fff;font-size:14px}
   button.primary{padding:12px 16px;border-radius:999px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#062433;font-weight:700;cursor:pointer}
   button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#fff;padding:10px 12px;border-radius:10px}
+
   ul.expense-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
   li.expense{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border-radius:10px;background:rgba(0,0,0,0.16);border:1px solid rgba(255,255,255,0.03)}
   .meta{display:flex;flex-direction:column;gap:4px}
   .meta .name{font-weight:600}
   .meta .small{font-size:12px;color:rgba(255,255,255,0.75)}
+
   .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .chart-wrap{min-width:280px;border-radius:12px;overflow:hidden}
-  .badge{display:inline-block;padding:2px 6px;margin-right:4px;background:rgba(255,255,255,0.1);border-radius:6px;font-size:12px;color:#fff}
+
   #challenge-popup{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:1200;display:none;padding:14px;border-radius:14px;background:linear-gradient(180deg,#ffffff,#f7f7f7);color:#112;box-shadow:0 18px 40px rgba(2,6,23,0.6)}
   .confetti{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:1200;opacity:0.95}
+
   @media (max-width:900px){ .cards{grid-template-columns:repeat(2,1fr)} .charts{grid-template-columns:1fr} }
-  @media (max-width:520px){ .brand h1{display:none} .menu-btn{display:flex} nav{display:none} .cards{grid-template-columns:1fr} .app{padding:12px} .chart-wrap{min-width:320px} }
+  @media (max-width:520px){
+    .brand h1{display:none} .menu-btn{display:flex} nav{display:none}
+    .cards{grid-template-columns:1fr} .app{padding:12px} .chart-wrap{min-width:320px}
+  }
   .mobile-nav{position:fixed;top:68px;left:8px;right:8px;background:var(--glass);backdrop-filter:blur(8px);border-radius:12px;padding:8px;display:none;z-index:150}
   .mobile-nav a{display:block;padding:10px;border-radius:8px;color:#eaf7ff}
   .mobile-nav.show{display:block}
 </style>
 </head>
 <body>
+  <!-- realistic background -->
   <div class="bg-wrap" aria-hidden="true">
-    <svg class="bg-wave" viewBox="0 0 1200 200" preserveAspectRatio="none">
+    <svg class="bg-wave" viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a90e2"/><stop offset="1" stop-color="#50e3c2"/></linearGradient></defs>
       <path d="M0,200 C150,120 350,40 600,60 C850,80 1050,160 1200,140 L1200 200 L0 200 Z" fill="url(#g1)"/>
     </svg>
@@ -81,6 +102,7 @@
         <div class="logo">BT</div>
         <div><h1>Budget Tracker</h1><div style="font-size:12px;color:rgba(255,255,255,0.75)">Smart • Gamified • Emotion-aware</div></div>
       </div>
+
       <div style="display:flex;align-items:center;gap:8px">
         <button class="menu-btn" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
         <nav id="main-nav" aria-label="Main navigation">
@@ -103,15 +125,15 @@
 
     <main>
       <!-- DASHBOARD -->
-      <section id="dashboard" class="section active">
-        <div class="cards">
+      <section id="dashboard" class="section active" aria-labelledby="dashboard">
+        <div class="cards" role="region" aria-label="summary cards">
           <div class="card"><h3>Total Budget</h3><div class="value" id="total-budget">₹0</div></div>
           <div class="card"><h3>Total Expense</h3><div class="value" id="total-expense">₹0</div></div>
           <div class="card"><h3>Remaining</h3><div class="value" id="remaining-budget">₹0</div><div class="progress"><i id="progress-fill"></i></div></div>
           <div class="card"><h3>Level</h3><div class="value" id="level">1</div><div class="progress"><i id="level-fill"></i></div><div id="badges" style="margin-top:8px"></div><div style="margin-top:6px;color:rgba(255,255,255,0.9)" id="streak">Streak: 0 days</div></div>
         </div>
 
-        <div class="section"><div class="panel"><h3 style="margin-top:0">Recent</h3><ul id="recent-expenses" class="expense-list"></ul></div></div>
+        <div class="section"><div class="panel"><h3 style="margin-top:0">Recent</h3><ul id="recent-expenses" class="expense-list" aria-live="polite"></ul></div></div>
 
         <div class="cards" style="margin-top:12px">
           <div class="card"><h3>Savings Goal</h3><div class="value" id="goal-progress">₹0 / ₹0</div><div class="progress"><i id="goal-fill"></i></div></div>
@@ -120,7 +142,7 @@
       </section>
 
       <!-- ADD -->
-      <section id="add-expense" class="section">
+      <section id="add-expense" class="section" aria-labelledby="add-expense">
         <div class="panel">
           <h3 style="margin-top:0">Add Expense</h3>
           <form id="expense-form" autocomplete="off">
@@ -135,15 +157,17 @@
             </div>
             <button class="primary" type="submit">Add Expense</button>
           </form>
+
           <div style="margin-top:10px">
             <input id="search-expense" type="text" placeholder="Search expenses (name, category, emotion)..." style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%;background:transparent;color:#fff">
           </div>
-          <div style="margin-top:12px"><ul id="expense-list" class="expense-list"></ul></div>
+
+          <div style="margin-top:12px"><ul id="expense-list" class="expense-list" aria-live="polite"></ul></div>
         </div>
       </section>
 
       <!-- REPORTS -->
-      <section id="reports" class="section">
+      <section id="reports" class="section" aria-labelledby="reports">
         <div class="charts" style="margin-bottom:12px">
           <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">By Category</h3><canvas id="categoryChart"></canvas></div>
           <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">Monthly</h3><canvas id="monthlyChart"></canvas></div>
@@ -152,12 +176,12 @@
       </section>
 
       <!-- EMOTIONS -->
-      <section id="emotions" class="section">
+      <section id="emotions" class="section" aria-labelledby="emotions">
         <div class="panel"><h3 style="margin-top:0">Emotion Insights</h3><p id="emotion-insight" style="font-weight:600;color:#eaf7ff">No data yet — add expenses with emotions.</p></div>
       </section>
 
       <!-- SETTINGS -->
-      <section id="settings" class="section">
+      <section id="settings" class="section" aria-labelledby="settings">
         <div class="panel">
           <h3 style="margin-top:0">Settings</h3>
           <form id="budget-form">
@@ -173,270 +197,194 @@
 
   <div id="challenge-popup" role="dialog" aria-modal="true"><div id="challenge-text" style="font-weight:700"></div><div style="margin-top:12px;text-align:center"><button onclick="closeChallenge()" class="primary">Got it</button></div></div>
 
-  
 <script>
-/* -------------------------
-   App state & persistence
-   ------------------------- */
-let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-let totalBudget = parseFloat(localStorage.getItem('budget')) || 50000;
-let goalAmount = parseFloat(localStorage.getItem('goalAmount')) || 10000;
-let streakDays = parseInt(localStorage.getItem('streakDays')) || 0;
-let lastDate = localStorage.getItem('lastDate') || null;
-let points = parseInt(localStorage.getItem('points')) || 0;
+<script>
+/* -------- NAVIGATION -------- */
+const sections = document.querySelectorAll('main .section');
+const navLinks = document.querySelectorAll('.nav-link');
+const mobileNavLinks = document.querySelectorAll('.mobile-nav a');
+const mobileNav = document.getElementById('mobile-nav');
+document.getElementById('hamburger').addEventListener('click', ()=>mobileNav.classList.toggle('show'));
 
-/* ---------- UI helpers ---------- */
-const fmt = v => (typeof v === 'number' ? v.toLocaleString() : v);
-
-/* ---------- NAV behaviour ---------- */
-document.querySelectorAll('.nav-link').forEach(a=>{
-  a.addEventListener('click', ()=> showSection(a.dataset.section));
-});
-document.querySelectorAll('.mobile-nav a').forEach(a=>{
-  a.addEventListener('click', ()=> { showSection(a.dataset.section); document.getElementById('mobile-nav').classList.remove('show'); });
-});
-document.getElementById('hamburger').addEventListener('click', ()=> document.getElementById('mobile-nav').classList.toggle('show'));
-
-function setActiveNav(id){
-  document.querySelectorAll('.nav-link').forEach(a => a.classList.toggle('active', a.dataset.section === id));
-}
-
-/* ---------- Sections ---------- */
 function showSection(id){
-  document.querySelectorAll('main section').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.classList.add('active');
-  setActiveNav(id);
-  // small delay before heavy redraws (charts) so layout is updated
-  if(id === 'reports'){
-    setTimeout(()=>{ try { updateCharts(); } catch(err){ console.error(err); } }, 80);
-  }
-  if(id === 'emotions') setTimeout(updateEmotionAnalysis, 60);
-  if(id === 'dashboard') setTimeout(updateDashboard, 40);
+  sections.forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  navLinks.forEach(a=>a.classList.toggle('active', a.dataset.section===id));
+  mobileNavLinks.forEach(a=>a.classList.toggle('active', a.dataset.section===id));
+  mobileNav.classList.remove('show');
+  updateCharts(); // redraw charts
 }
 
-/* ---------- Save / Load ---------- */
-function saveData(){
-  localStorage.setItem('expenses', JSON.stringify(expenses));
-  localStorage.setItem('budget', totalBudget);
-  localStorage.setItem('goalAmount', goalAmount);
-  localStorage.setItem('streakDays', streakDays);
-  localStorage.setItem('lastDate', lastDate);
-  localStorage.setItem('points', points);
-}
+navLinks.forEach(a=>a.addEventListener('click',()=>showSection(a.dataset.section)));
+mobileNavLinks.forEach(a=>a.addEventListener('click',()=>showSection(a.dataset.section)));
 
-/* ---------- Render expenses list & recent ---------- */
-function renderExpenses(){
-  const list = document.getElementById('expense-list');
-  const recent = document.getElementById('recent-expenses');
-  list.innerHTML = ''; recent.innerHTML = '';
-  expenses.slice().reverse().forEach((e, idx) => {
-    const li = document.createElement('li'); li.className = 'expense';
-    li.innerHTML = `<div class="meta"><div class="name">${escapeHtml(e.name)} • ₹${fmt(e.amount)}</div><div class="small">${e.date} • ${escapeHtml(e.category)} • ${escapeHtml(e.emotion)}</div></div>
-      <div style="display:flex;gap:8px;align-items:center"><div style="font-weight:700;color:#fff">₹${fmt(e.amount)}</div>
-      <button class="delete-btn" aria-label="Delete expense">Delete</button></div>`;
-    li.querySelector('.delete-btn').addEventListener('click', () => {
-      const originalIndex = expenses.indexOf(e);
-      if (originalIndex > -1) { expenses.splice(originalIndex, 1); saveData(); renderExpenses(); updateDashboard(); try{ updateCharts(); }catch{} updateEmotionAnalysis(); }
-    });
-    list.appendChild(li);
-    if(idx < 5){ const li2 = li.cloneNode(true); const btn = li2.querySelector('.delete-btn'); if(btn) btn.remove(); recent.appendChild(li2); }
-  });
-}
-function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+/* -------- DATA STORAGE -------- */
+let expenses = JSON.parse(localStorage.getItem('expenses')||'[]');
+let budget = parseFloat(localStorage.getItem('budget')||0);
+let goal = parseFloat(localStorage.getItem('goal')||0);
+let streak = parseInt(localStorage.getItem('streak')||0);
+let level = parseInt(localStorage.getItem('level')||1);
+let badges = JSON.parse(localStorage.getItem('badges')||'[]');
 
-/* ---------- Dashboard updates ---------- */
-function updateDashboard(){
-  const totalExpense = expenses.reduce((a,b) => a + (Number(b.amount)||0), 0);
-  document.getElementById('total-budget').textContent = `₹${fmt(totalBudget)}`;
-  document.getElementById('total-expense').textContent = `₹${fmt(totalExpense)}`;
-  const remaining = totalBudget - totalExpense;
-  document.getElementById('remaining-budget').textContent = `₹${fmt(remaining)}`;
-  const progressPct = totalBudget>0 ? Math.min(100, Math.round(totalExpense/totalBudget*100)) : 0;
-  document.getElementById('progress-fill').style.width = progressPct + '%';
+/* -------- DOM ELEMENTS -------- */
+const totalBudgetEl = document.getElementById('total-budget');
+const totalExpenseEl = document.getElementById('total-expense');
+const remainingBudgetEl = document.getElementById('remaining-budget');
+const progressFill = document.getElementById('progress-fill');
+const goalFill = document.getElementById('goal-fill');
+const goalProgress = document.getElementById('goal-progress');
+const levelEl = document.getElementById('level');
+const levelFill = document.getElementById('level-fill');
+const badgesEl = document.getElementById('badges');
+const streakEl = document.getElementById('streak');
+const recentEl = document.getElementById('recent-expenses');
+const expenseListEl = document.getElementById('expense-list');
+const searchInput = document.getElementById('search-expense');
+const emotionInsightEl = document.getElementById('emotion-insight');
+const categoryChartCtx = document.getElementById('categoryChart').getContext('2d');
+const monthlyChartCtx = document.getElementById('monthlyChart').getContext('2d');
+const emotionChartCtx = document.getElementById('emotionChart').getContext('2d');
 
-  points = Math.floor(totalExpense/100);
-  const level = Math.floor(points/10)+1;
-  document.getElementById('level').textContent = level;
-  document.getElementById('level-fill').style.width = Math.min(100, (points%10)*10) + '%';
-
-  const badges = [];
-  if(points >= 20) badges.push('Saver');
-  if(points >= 50) badges.push('Budget Master');
-  if(points >= 100) badges.push('Finance Guru');
-  const badgesEl = document.getElementById('badges'); badgesEl.innerHTML = '';
-  badges.forEach(b => { const sp = document.createElement('span'); sp.className = 'badge'; sp.textContent = b + ' 🏆'; badgesEl.appendChild(sp); });
-
-  if(badges.length) createConfettiSmall();
-
-  const today = new Date().toISOString().split('T')[0];
-  if(lastDate === today){}
-  else {
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    if(lastDate === yesterday) streakDays++; else streakDays = 1;
-    lastDate = today; saveData();
-  }
-  document.getElementById('streak').textContent = `Streak: ${streakDays} days`;
-
-  document.getElementById('goal-progress').textContent = `₹${fmt(totalExpense)} / ₹${fmt(goalAmount)}`;
-  const goalPct = goalAmount>0 ? Math.min(100, Math.round(totalExpense/goalAmount*100)) : 0;
-  document.getElementById('goal-fill').style.width = goalPct + '%';
-
-  const catTotals = {};
-  expenses.forEach(e => catTotals[e.category] = (catTotals[e.category]||0) + Number(e.amount||0));
-  let topCat = '-';
-  if(Object.keys(catTotals).length) topCat = Object.keys(catTotals).reduce((a,b)=> catTotals[a] >= catTotals[b] ? a : b);
-  document.getElementById('top-category').textContent = topCat;
-}
-
-/* ---------- Charts (Chart.js) ---------- */
-let categoryChart=null, monthlyChart=null, emotionChart=null;
+/* -------- CHARTS -------- */
+let categoryChart, monthlyChart, emotionChart;
 function updateCharts(){
-  try {
-    const catMap = {}; expenses.forEach(e => { catMap[e.category] = (catMap[e.category]||0) + Number(e.amount||0); });
-    const catLabels = Object.keys(catMap), catData = Object.values(catMap);
-
-    const mon = {};
-    expenses.forEach(e => { const m = e.date ? e.date.substring(0,7) : new Date().toISOString().slice(0,7); mon[m] = (mon[m]||0) + Number(e.amount||0); });
-    const monthLabels = Object.keys(mon).sort(), monthData = monthLabels.map(l => mon[l]);
-
-    const emo = {}; expenses.forEach(e=> emo[e.emotion] = (emo[e.emotion]||0) + Number(e.amount||0));
-    const emoLabels = Object.keys(emo), emoData = Object.values(emo);
-
-    if(categoryChart) categoryChart.destroy();
-    if(monthlyChart) monthlyChart.destroy();
-    if(emotionChart) emotionChart.destroy();
-
-    const ctx1 = document.getElementById('categoryChart').getContext('2d');
-    categoryChart = new Chart(ctx1, { type:'pie', data:{ labels:catLabels, datasets:[{data:catData, backgroundColor:['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db']}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}} });
-
-    const ctx2 = document.getElementById('monthlyChart').getContext('2d');
-    monthlyChart = new Chart(ctx2, { type:'bar', data:{ labels:monthLabels, datasets:[{label:'Expenses', data:monthData, backgroundColor:'#50e3c2'}] }, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}} });
-
-    const ctx3 = document.getElementById('emotionChart').getContext('2d');
-    emotionChart = new Chart(ctx3, { type:'doughnut', data:{ labels:emoLabels, datasets:[{data:emoData, backgroundColor:['#f5a623','#e74c3c','#9b59b6','#2ecc71','#3498db']}]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}} });
-
-    [document.getElementById('categoryChart'), document.getElementById('monthlyChart'), document.getElementById('emotionChart')].forEach(c=>{ if(c) c.style.height='240px'; });
-  } catch(err) {
-    console.error('Chart error', err);
-  }
-}
-
-/* ---------- Emotion insight ---------- */
-function updateEmotionAnalysis(){
-  const emoMoney = {}; expenses.forEach(e => emoMoney[e.emotion] = (emoMoney[e.emotion]||0) + Number(e.amount||0));
-  let maxE = null, maxV = 0;
-  for(const k in emoMoney){ if(emoMoney[k] > maxV){ maxV = emoMoney[k]; maxE = k; } }
-  const insight = maxE ? `💡 You spend most when you feel ${maxE} (₹${fmt(maxV)}).` : 'Add expenses with emotions to see insights.';
-  document.getElementById('emotion-insight').textContent = insight;
-}
-
-/* ---------- Challenges & confetti ---------- */
-function runChallenge(expense){
-  if(!expense) return;
-  const popup = document.getElementById('challenge-popup');
-  const txt = document.getElementById('challenge-text');
-  if(expense.amount > 5000){ txt.textContent = "💰 Big spending alert — consider reviewing this purchase."; popup.style.display = 'block'; createConfettiBurst(); }
-  else if(expense.emotion === 'Stressed' && expense.amount > 500){ txt.textContent = "⚠️ Spent while stressed — try a calming activity instead of impulse buying."; popup.style.display = 'block'; createConfettiBurst(); }
-  else if(expense.emotion === 'Excited' && expense.amount > 1000){ txt.textContent = "🎉 Large spend while excited — nice treat! consider setting a saving next."; popup.style.display = 'block'; createConfettiBurst(); }
-}
-function closeChallenge(){ document.getElementById('challenge-popup').style.display = 'none'; }
-
-function createConfettiBurst(){
-  for(let i=0;i<18;i++){
-    const c = document.createElement('div'); c.className = 'confetti';
-    c.style.left = (10 + Math.random()*80) + '%'; c.style.top = (10 + Math.random()*40) + '%';
-    c.style.width = (6 + Math.random()*8) + 'px'; c.style.height = c.style.width;
-    c.style.background = ['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db'][Math.floor(Math.random()*5)];
-    document.body.appendChild(c);
-    const dx = (Math.random()*200)-100, dy = 200 + Math.random()*240;
-    c.animate([{transform:'translateY(0px) rotate(0deg)', opacity:1},{transform:`translate(${dx}px,${dy}px) rotate(${(Math.random()*720)}deg)`, opacity:0}], {duration:1600 + Math.random()*1000, easing:'cubic-bezier(.2,.9,.3,1)'});
-    setTimeout(()=>c.remove(),2400);
-  }
-}
-function createConfettiSmall(){
-  for(let i=0;i<8;i++){
-    const c = document.createElement('div'); c.className='confetti';
-    c.style.left = (30 + Math.random()*40) + '%'; c.style.top = (10 + Math.random()*30) + '%';
-    c.style.width = '6px'; c.style.height = '6px'; c.style.background = ['#f5a623','#f39c12','#50e3c2'][Math.floor(Math.random()*3)];
-    document.body.appendChild(c);
-    c.animate([{transform:'translateY(0px)', opacity:1},{transform:'translateY(120px)', opacity:0}], {duration:900+Math.random()*600, easing:'ease-out'});
-    setTimeout(()=>c.remove(),1600);
-  }
-}
-
-/* ---------- Add expense handler ---------- */
-document.getElementById('expense-form').addEventListener('submit', e => {
-  e.preventDefault();
-  const name = document.getElementById('name').value.trim();
-  const amount = Number(document.getElementById('amount').value);
-  const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
-  const category = document.getElementById('category').value || 'Others';
-  const emotion = document.getElementById('emotion').value || 'Neutral';
-  if(!name || !amount) return;
-  const exp = { name, amount, date, category, emotion };
-  expenses.push(exp);
-  saveData();
-  renderExpenses(); updateDashboard(); setTimeout(()=>{ try{ updateCharts(); }catch{} }, 100);
-  updateEmotionAnalysis();
-  runChallenge(exp);
-  e.target.reset();
-});
-
-/* ---------- Search ---------- */
-document.getElementById('search-expense').addEventListener('input', e => {
-  const q = (e.target.value || '').trim().toLowerCase();
-  document.querySelectorAll('#expense-list li.expense').forEach(li => {
-    li.style.display = q ? (li.textContent.toLowerCase().includes(q) ? 'flex' : 'none') : 'flex';
+  const catData = {}, monthData = {}, emoData={};
+  expenses.forEach(e=>{
+    catData[e.category] = (catData[e.category]||0)+e.amount;
+    const m = new Date(e.date).toLocaleString('default',{month:'short'});
+    monthData[m] = (monthData[m]||0)+e.amount;
+    emoData[e.emotion] = (emoData[e.emotion]||0)+1;
   });
-});
 
-/* ---------- Budget form ---------- */
-document.getElementById('budget-form').addEventListener('submit', e => {
-  e.preventDefault();
-  const nb = Number(document.getElementById('new-budget').value);
-  const ng = Number(document.getElementById('goal-amount').value);
-  if(!isNaN(nb)) totalBudget = nb;
-  if(!isNaN(ng)) goalAmount = ng;
-  saveData(); updateDashboard();
-  e.target.reset();
-});
+  const catLabels = Object.keys(catData), catValues = Object.values(catData);
+  const monthLabels = Object.keys(monthData), monthValues = Object.values(monthData);
+  const emoLabels = Object.keys(emoData), emoValues = Object.values(emoData);
 
-/* ---------- Reset / Export ---------- */
-document.getElementById('reset-btn').addEventListener('click', () => {
-  if(!confirm('Reset all app data? This cannot be undone.')) return;
-  expenses = []; totalBudget = 50000; goalAmount = 10000; streakDays = 0; lastDate = null; points = 0;
-  saveData(); renderExpenses(); updateDashboard(); try{ updateCharts(); }catch{} updateEmotionAnalysis();
-});
-document.getElementById('export-btn').addEventListener('click', () => {
-  const header = 'Date,Name,Amount,Category,Emotion\n';
-  const rows = expenses.map(e => `${e.date},${escapeCsv(e.name)},${e.amount},${escapeCsv(e.category)},${escapeCsv(e.emotion)}`).join('\n');
-  const csv = header + rows;
-  const blob = new Blob([csv], {type:'text/csv'}); const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'expenses.csv'; a.click(); URL.revokeObjectURL(url);
-});
-function escapeCsv(s){ return `"${(s+'').replace(/"/g,'""')}"`; }
-
-/* ---------- Init ---------- */
-function init(){
-  renderExpenses(); updateDashboard(); setTimeout(()=>{ try{ updateCharts(); }catch(err){ console.warn(err); } }, 150);
-  updateEmotionAnalysis();
-  setActiveNav('dashboard');
+  if(categoryChart) categoryChart.destroy();
+  categoryChart = new Chart(categoryChartCtx,{type:'pie',data:{labels:catLabels,datasets:[{data:catValues,backgroundColor:['#4a90e2','#50e3c2','#f5a623','#d0021b','#9013fe']}]},options:{plugins:{legend:{position:'bottom'}}}});
+  
+  if(monthlyChart) monthlyChart.destroy();
+  monthlyChart = new Chart(monthlyChartCtx,{type:'bar',data:{labels:monthLabels,datasets:[{label:'Monthly Expense',data:monthValues,backgroundColor:'#50e3c2'}]},options:{scales:{y:{beginAtZero:true}}}});
+  
+  if(emotionChart) emotionChart.destroy();
+  emotionChart = new Chart(emotionChartCtx,{type:'doughnut',data:{labels:emoLabels,datasets:[{data:emoValues,backgroundColor:['#4a90e2','#50e3c2','#f5a623','#d0021b','#9013fe']}]},options:{plugins:{legend:{position:'bottom'}}}});
 }
-init();
 
-/* redraw charts on resize/orientation change */
-window.addEventListener('resize', () => {
-  try {
-    updateCharts();
-  } catch (err) {
-    console.warn('Chart redraw error:', err);
+/* -------- RENDER UI -------- */
+function render(){
+  const totalExp = expenses.reduce((a,e)=>a+e.amount,0);
+  totalBudgetEl.textContent = `₹${budget}`;
+  totalExpenseEl.textContent = `₹${totalExp}`;
+  const remaining = Math.max(budget-totalExp,0);
+  remainingBudgetEl.textContent = `₹${remaining}`;
+  const prog = budget>0? Math.min((totalExp/budget)*100,100):0;
+  progressFill.style.width = prog+'%';
+
+  goalProgress.textContent = `₹${Math.min(totalExp,goal)} / ₹${goal}`;
+  goalFill.style.width = goal>0? Math.min((totalExp/goal)*100,100)+'%':'0%';
+
+  levelEl.textContent = level;
+  levelFill.style.width = Math.min(level*10,100)+'%';
+  badgesEl.innerHTML = badges.map(b=>`<span style="font-size:16px;margin-right:4px">${b}</span>`).join('');
+  streakEl.textContent = `Streak: ${streak} days`;
+
+  recentEl.innerHTML = expenses.slice(-5).reverse().map(e=>`<li class="expense"><div class="meta"><div class="name">${e.name}</div><div class="small">${e.category} • ${e.emotion} • ${e.date}</div></div><div class="value">₹${e.amount}</div></li>`).join('');
+  
+  renderExpenseList(expenses);
+  renderEmotionInsights();
+  updateCharts();
+}
+function renderExpenseList(list){
+  const q = searchInput.value.toLowerCase();
+  expenseListEl.innerHTML = list.filter(e=>e.name.toLowerCase().includes(q)||e.category.toLowerCase().includes(q)||e.emotion.toLowerCase().includes(q))
+    .map(e=>`<li class="expense"><div class="meta"><div class="name">${e.name}</div><div class="small">${e.category} • ${e.emotion} • ${e.date}</div></div><div class="value">₹${e.amount}</div></li>`).join('');
+}
+
+/* -------- EMOTIONS INSIGHTS -------- */
+function renderEmotionInsights(){
+  const emoCount = {};
+  expenses.forEach(e=>emoCount[e.emotion]=(emoCount[e.emotion]||0)+1);
+  const entries = Object.entries(emoCount).sort((a,b)=>b[1]-a[1]);
+  emotionInsightEl.textContent = entries.length? `Most frequent emotion: ${entries[0][0]}` : "No data yet — add expenses with emotions.";
+}
+
+/* -------- FORM HANDLERS -------- */
+document.getElementById('expense-form').addEventListener('submit', e=>{
+  e.preventDefault();
+  const name=document.getElementById('name').value;
+  const amount=parseFloat(document.getElementById('amount').value);
+  const date=document.getElementById('date').value;
+  const category=document.getElementById('category').value;
+  const emotion=document.getElementById('emotion').value;
+  const newExpense={name,amount,date,category,emotion};
+  expenses.push(newExpense);
+  localStorage.setItem('expenses',JSON.stringify(expenses));
+  document.getElementById('expense-form').reset();
+  updateLevel(newExpense);
+  render();
+});
+
+function updateLevel(exp){
+  const totalExp = expenses.reduce((a,e)=>a+e.amount,0);
+  const oldLevel = level;
+  level = 1 + Math.floor(totalExp/1000);
+  if(level>oldLevel){
+    badges.push('🏆');
+    triggerConfetti();
+  }
+  localStorage.setItem('level',level);
+  localStorage.setItem('badges',JSON.stringify(badges));
+}
+
+/* -------- SEARCH -------- */
+searchInput.addEventListener('input',()=>renderExpenseList(expenses));
+
+/* -------- BUDGET & GOAL -------- */
+document.getElementById('budget-form').addEventListener('submit', e=>{
+  e.preventDefault();
+  budget = parseFloat(document.getElementById('new-budget').value);
+  goal = parseFloat(document.getElementById('goal-amount').value);
+  localStorage.setItem('budget',budget);
+  localStorage.setItem('goal',goal);
+  render();
+});
+
+/* -------- EXPORT CSV -------- */
+document.getElementById('export-btn').addEventListener('click', ()=>{
+  if(!expenses.length) return alert("No data to export!");
+  let csv='Name,Amount,Date,Category,Emotion\n';
+  expenses.forEach(e=>csv+=`${e.name},${e.amount},${e.date},${e.category},${e.emotion}\n`);
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='expenses.csv'; a.click(); URL.revokeObjectURL(url);
+});
+
+/* -------- RESET -------- */
+document.getElementById('reset-btn').addEventListener('click', ()=>{
+  if(confirm("Reset all data?")){
+    localStorage.clear(); location.reload();
   }
 });
 
+/* -------- CHALLENGE & CONFETTI -------- */
+const challengePopup = document.getElementById('challenge-popup');
+function triggerConfetti(){
+  challengePopup.style.display='block';
+  const colors = ['#4a90e2','#50e3c2','#f5a623','#d0021b','#9013fe'];
+  for(let i=0;i<100;i++){
+    const div=document.createElement('div'); div.className='confetti';
+    div.style.background=colors[Math.floor(Math.random()*colors.length)];
+    div.style.left=Math.random()*window.innerWidth+'px';
+    div.style.top=Math.random()*window.innerHeight+'px';
+    div.style.width=div.style.height=Math.random()*6+4+'px';
+    document.body.appendChild(div);
+    setTimeout(()=>div.remove(),3000+Math.random()*3000);
+  }
+}
+function closeChallenge(){challengePopup.style.display='none';}
+
+/* -------- INITIAL RENDER -------- */
+render();
 </script>
 </body>
 </html>
-
-
