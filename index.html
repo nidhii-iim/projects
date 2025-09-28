@@ -198,15 +198,9 @@
   <div id="challenge-popup" role="dialog" aria-modal="true"><div id="challenge-text" style="font-weight:700"></div><div style="margin-top:12px;text-align:center"><button onclick="closeChallenge()" class="primary">Got it</button></div></div>
 
 <script>
-<script>
-/* -------- NAVIGATION -------- */
-const sections = document.querySelectorAll('main .section');
-const navLinks = document.querySelectorAll('.nav-link');
-const mobileNavLinks = document.querySelectorAll('.mobile-nav a');
-const mobileNav = document.getElementById('mobile-nav');
-document.getElementById('hamburger').addEventListener('click', ()=>mobileNav.classList.toggle('show'));
-
-  document.addEventListener('DOMContentLoaded', ()=>{
+// ------------------ FULL JS INCLUDING NAV FIX ------------------
+document.addEventListener('DOMContentLoaded', ()=>{
+  // NAVIGATION
   const navLinks = document.querySelectorAll('.nav-link');
   const mobileNavLinks = document.querySelectorAll('.mobile-nav a');
   const sections = document.querySelectorAll('main section');
@@ -217,41 +211,22 @@ document.getElementById('hamburger').addEventListener('click', ()=>mobileNav.cla
     sections.forEach(s=>s.classList.remove('active'));
     const section = document.getElementById(id);
     if(section) section.classList.add('active');
-
     navLinks.forEach(a=>a.classList.toggle('active', a.dataset.section===id));
     mobileNavLinks.forEach(a=>a.classList.toggle('active', a.dataset.section===id));
     mobileNav.classList.remove('show');
-
-    // redraw charts or update dashboard if needed
     if(id==='dashboard') updateDashboard();
-    if(id==='reports') setTimeout(updateCharts, 50);
-    if(id==='emotions') setTimeout(updateEmotionAnalysis, 50);
+    if(id==='reports') setTimeout(updateCharts,50);
+    if(id==='emotions') setTimeout(updateEmotionAnalysis,50);
   }
 
-  navLinks.forEach(a=>{
-    a.addEventListener('click', ()=> showSection(a.dataset.section));
-  });
-  mobileNavLinks.forEach(a=>{
-    a.addEventListener('click', ()=> showSection(a.dataset.section));
-  });
-
+  navLinks.forEach(a=>a.addEventListener('click', ()=> showSection(a.dataset.section)));
+  mobileNavLinks.forEach(a=>a.addEventListener('click', ()=> showSection(a.dataset.section)));
   hamburger.addEventListener('click', ()=> mobileNav.classList.toggle('show'));
 
-  // initialize default view
+  // initialize
   showSection('dashboard');
 });
 
-function showSection(id){
-  sections.forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  navLinks.forEach(a=>a.classList.toggle('active', a.dataset.section===id));
-  mobileNavLinks.forEach(a=>a.classList.toggle('active', a.dataset.section===id));
-  mobileNav.classList.remove('show');
-  updateCharts(); // redraw charts
-}
-
-navLinks.forEach(a=>a.addEventListener('click',()=>showSection(a.dataset.section)));
-mobileNavLinks.forEach(a=>a.addEventListener('click',()=>showSection(a.dataset.section)));
 
 /* -------- DATA STORAGE -------- */
 let expenses = JSON.parse(localStorage.getItem('expenses')||'[]');
@@ -423,4 +398,5 @@ render();
 </script>
 </body>
 </html>
+
 
