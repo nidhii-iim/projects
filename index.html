@@ -7,396 +7,269 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  /* ---------- BASE ---------- */
-  :root{
-    --bg1:#0f1724; --accent1:#4a90e2; --accent2:#50e3c2;
-    --glass: rgba(255,255,255,0.08); --glass-strong: rgba(255,255,255,0.14);
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0; font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-    background: linear-gradient(120deg,var(--bg1) 0%, #122233 60%, #0b2233 100%);
-    color: #fff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-  }
-
-  /* ---------- BACKGROUND ---------- */
-  .bg-wrap{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-  .bg-wave{position:absolute;left:50%;transform:translateX(-50%);bottom:-10vh;width:160vw;height:60vh;opacity:0.12;filter:blur(22px)}
-  .bg-vignette{position:fixed;inset:0;background:radial-gradient(1000px 600px at 10% 10%, rgba(255,255,255,0.02), transparent 10%), radial-gradient(900px 500px at 90% 90%, rgba(255,255,255,0.02), transparent 12%);pointer-events:none;z-index:0}
-  .particles{position:fixed;inset:0;z-index:0;pointer-events:none}
-  .particle{position:absolute;border-radius:50%;opacity:0.06;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.1));animation:float 22s linear infinite}
-  @keyframes float{0%{transform:translateY(100vh) translateX(0) scale(.6)}50%{transform:translateY(40vh) translateX(30vw) scale(1)}100%{transform:translateY(-10vh) translateX(60vw) scale(.6)}}
-
-  /* ---------- LAYOUT ---------- */
-  .app {position:relative;z-index:1;max-width:980px;margin:0 auto;padding:14px 16px 72px;}
-  header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#062433;box-shadow:0 6px 18px rgba(0,0,0,0.4)}
-  h1{font-size:1.05rem;margin:0}
-  .menu-btn{display:none;flex-direction:column;gap:4px;padding:8px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.02);cursor:pointer}
-  .menu-btn span{width:20px;height:2px;background:linear-gradient(90deg,#fff,rgba(255,255,255,0.8));display:block;border-radius:2px}
-
-  nav{display:flex;gap:8px;align-items:center}
-  nav a{padding:8px 12px;border-radius:12px;text-decoration:none;color:rgba(255,255,255,0.9);font-weight:600;cursor:pointer}
-  nav a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#052a34;box-shadow:0 8px 26px rgba(74,144,226,0.14)}
-
-  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
-  .card{background:var(--glass);border-radius:14px;padding:12px;box-shadow: 0 6px 18px rgba(2,6,23,0.45);backdrop-filter: blur(8px);border:1px solid rgba(255,255,255,0.03);transition:transform .22s, box-shadow .22s}
-  .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,23,0.6)}
-  .card h3{margin:0;font-size:0.9rem;font-weight:600;color:#e6f7ff}
-  .card .value{font-weight:700;font-size:1.15rem;margin-top:6px;color:#fff}
-  .progress{height:10px;background:rgba(255,255,255,0.06);border-radius:999px;margin-top:8px;overflow:hidden}
-  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .8s ease}
-
-  .section{margin-top:8px}
-  .panel{background:var(--glass-strong);border-radius:14px;padding:12px;box-shadow:0 12px 28px rgba(2,6,23,0.45);border:1px solid rgba(255,255,255,0.04)}
-
-  form{display:flex;flex-direction:column;gap:10px}
-  .row{display:flex;gap:8px;align-items:center}
-  .row .half{flex:1}
-  input[type=text], input[type=number], input[type=date], select{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.12);color:#fff;font-size:14px}
-  button.primary{padding:12px 16px;border-radius:999px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#062433;font-weight:700;cursor:pointer}
-  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#fff;padding:10px 12px;border-radius:10px}
-
-  ul.expense-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
-  li.expense{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border-radius:10px;background:rgba(0,0,0,0.16);border:1px solid rgba(255,255,255,0.03)}
-  .meta{display:flex;flex-direction:column;gap:4px}
-  .meta .name{font-weight:600}
-  .meta .small{font-size:12px;color:rgba(255,255,255,0.75)}
-
-  .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .chart-wrap{min-width:280px;border-radius:12px;overflow:hidden}
-
-  #challenge-popup{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:1200;display:none;padding:14px;border-radius:14px;background:linear-gradient(180deg,#ffffff,#f7f7f7);color:#112;box-shadow:0 18px 40px rgba(2,6,23,0.6)}
-  .confetti{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:1200;opacity:0.95}
-
-  @media (max-width:900px){ .cards{grid-template-columns:repeat(2,1fr)} .charts{grid-template-columns:1fr} }
-  @media (max-width:520px){
-    .brand h1{display:none} .menu-btn{display:flex} nav{display:none}
-    .cards{grid-template-columns:1fr} .app{padding:12px} .chart-wrap{min-width:320px}
-  }
-  .mobile-nav{position:fixed;top:68px;left:8px;right:8px;background:var(--glass);backdrop-filter:blur(8px);border-radius:12px;padding:8px;display:none;z-index:150}
-  .mobile-nav a{display:block;padding:10px;border-radius:8px;color:#eaf7ff}
-  .mobile-nav.show{display:block}
+/* ---------- BASE ---------- */
+:root{
+  --bg1:#0f1724; --accent1:#4a90e2; --accent2:#50e3c2;
+  --glass: rgba(255,255,255,0.08); --glass-strong: rgba(255,255,255,0.14);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  background: linear-gradient(120deg,var(--bg1) 0%, #122233 60%, #0b2233 100%);
+  color: #fff; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+/* ---------- BACKGROUND ---------- */
+.bg-wrap{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-wave{position:absolute;left:50%;transform:translateX(-50%);bottom:-10vh;width:160vw;height:60vh;opacity:0.12;filter:blur(22px)}
+.bg-vignette{position:fixed;inset:0;background:radial-gradient(1000px 600px at 10% 10%, rgba(255,255,255,0.02), transparent 10%), radial-gradient(900px 500px at 90% 90%, rgba(255,255,255,0.02), transparent 12%);pointer-events:none;z-index:0}
+.particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+.particle{position:absolute;border-radius:50%;opacity:0.06;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.1));animation:float 22s linear infinite}
+@keyframes float{0%{transform:translateY(100vh) translateX(0) scale(.6)}50%{transform:translateY(40vh) translateX(30vw) scale(1)}100%{transform:translateY(-10vh) translateX(60vw) scale(.6)}}
+/* ---------- LAYOUT ---------- */
+.app {position:relative;z-index:1;max-width:980px;margin:0 auto;padding:14px 16px 72px;}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#062433;box-shadow:0 6px 18px rgba(0,0,0,0.4)}
+h1{font-size:1.05rem;margin:0}
+.menu-btn{display:none;flex-direction:column;gap:4px;padding:8px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.02);cursor:pointer}
+.menu-btn span{width:20px;height:2px;background:linear-gradient(90deg,#fff,rgba(255,255,255,0.8));display:block;border-radius:2px}
+nav{display:flex;gap:8px;align-items:center}
+nav a{padding:8px 12px;border-radius:12px;text-decoration:none;color:rgba(255,255,255,0.9);font-weight:600;cursor:pointer}
+nav a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#052a34;box-shadow:0 8px 26px rgba(74,144,226,0.14)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+.card{background:var(--glass);border-radius:14px;padding:12px;box-shadow: 0 6px 18px rgba(2,6,23,0.45);backdrop-filter: blur(8px);border:1px solid rgba(255,255,255,0.03);transition:transform .22s, box-shadow .22s}
+.card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,23,0.6)}
+.card h3{margin:0;font-size:0.9rem;font-weight:600;color:#e6f7ff}
+.card .value{font-weight:700;font-size:1.15rem;margin-top:6px;color:#fff}
+.progress{height:10px;background:rgba(255,255,255,0.06);border-radius:999px;margin-top:8px;overflow:hidden}
+.progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .8s ease}
+.section{margin-top:8px;display:none}
+.section.active{display:block}
+.panel{background:var(--glass-strong);border-radius:14px;padding:12px;box-shadow:0 12px 28px rgba(2,6,23,0.45);border:1px solid rgba(255,255,255,0.04)}
+form{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px;align-items:center}
+.row .half{flex:1}
+input[type=text], input[type=number], input[type=date], select{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.12);color:#fff;font-size:14px}
+button.primary{padding:12px 16px;border-radius:999px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#062433;font-weight:700;cursor:pointer}
+button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#fff;padding:10px 12px;border-radius:10px}
+ul.expense-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+li.expense{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border-radius:10px;background:rgba(0,0,0,0.16);border:1px solid rgba(255,255,255,0.03)}
+.meta{display:flex;flex-direction:column;gap:4px}
+.meta .name{font-weight:600}
+.meta .small{font-size:12px;color:rgba(255,255,255,0.75)}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chart-wrap{min-width:280px;border-radius:12px;overflow:hidden}
+#challenge-popup{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:1200;display:none;padding:14px;border-radius:14px;background:linear-gradient(180deg,#ffffff,#f7f7f7);color:#112;box-shadow:0 18px 40px rgba(2,6,23,0.6)}
+.confetti{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:1200;opacity:0.95}
+@media (max-width:900px){ .cards{grid-template-columns:repeat(2,1fr)} .charts{grid-template-columns:1fr} }
+@media (max-width:520px){
+  .brand h1{display:none} .menu-btn{display:flex} nav{display:none}
+  .cards{grid-template-columns:1fr} .app{padding:12px} .chart-wrap{min-width:320px}
+}
+.mobile-nav{position:fixed;top:68px;left:8px;right:8px;background:var(--glass);backdrop-filter:blur(8px);border-radius:12px;padding:8px;display:none;z-index:150}
+.mobile-nav a{display:block;padding:10px;border-radius:8px;color:#eaf7ff}
+.mobile-nav.show{display:block}
 </style>
 </head>
 <body>
-  <!-- realistic background -->
-  <div class="bg-wrap" aria-hidden="true">
-    <svg class="bg-wave" viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-      <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a90e2"/><stop offset="1" stop-color="#50e3c2"/></linearGradient></defs>
-      <path d="M0,200 C150,120 350,40 600,60 C850,80 1050,160 1200,140 L1200 200 L0 200 Z" fill="url(#g1)"/>
-    </svg>
-    <div class="bg-vignette"></div>
-    <div class="particles" aria-hidden="true">
-      <div class="particle" style="width:22px;height:22px;left:6%;top:30%;animation-duration:32s"></div>
-      <div class="particle" style="width:30px;height:30px;left:82%;top:60%;animation-duration:26s"></div>
-      <div class="particle" style="width:16px;height:16px;left:48%;top:12%;animation-duration:28s"></div>
+<div class="bg-wrap" aria-hidden="true">
+  <svg class="bg-wave" viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a90e2"/><stop offset="1" stop-color="#50e3c2"/></linearGradient></defs>
+    <path d="M0,200 C150,120 350,40 600,60 C850,80 1050,160 1200,140 L1200 200 L0 200 Z" fill="url(#g1)"/>
+  </svg>
+  <div class="bg-vignette"></div>
+  <div class="particles" aria-hidden="true">
+    <div class="particle" style="width:22px;height:22px;left:6%;top:30%;animation-duration:32s"></div>
+    <div class="particle" style="width:30px;height:30px;left:82%;top:60%;animation-duration:26s"></div>
+    <div class="particle" style="width:16px;height:16px;left:48%;top:12%;animation-duration:28s"></div>
+  </div>
+</div>
+
+<div class="app" role="application" aria-label="Budget tracker app">
+  <header>
+    <div class="brand">
+      <div class="logo">BT</div>
+      <div><h1>Budget Tracker</h1><div style="font-size:12px;color:rgba(255,255,255,0.75)">Smart • Gamified • Emotion-aware</div></div>
     </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="menu-btn" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <nav id="main-nav" aria-label="Main navigation">
+        <a data-section="dashboard" class="nav-link active">Dashboard</a>
+        <a data-section="add-expense" class="nav-link">Add</a>
+        <a data-section="reports" class="nav-link">Reports</a>
+        <a data-section="emotions" class="nav-link">Emotions</a>
+        <a data-section="settings" class="nav-link">Settings</a>
+      </nav>
+    </div>
+  </header>
+  <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+    <a data-section="dashboard">Dashboard</a>
+    <a data-section="add-expense">Add Expense</a>
+    <a data-section="reports">Reports</a>
+    <a data-section="emotions">Emotions</a>
+    <a data-section="settings">Settings</a>
   </div>
 
-  <div class="app" role="application" aria-label="Budget tracker app">
-    <header>
-      <div class="brand">
-        <div class="logo">BT</div>
-        <div><h1>Budget Tracker</h1><div style="font-size:12px;color:rgba(255,255,255,0.75)">Smart • Gamified • Emotion-aware</div></div>
+  <main>
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section active" aria-labelledby="dashboard">
+      <div class="cards" role="region" aria-label="summary cards">
+        <div class="card"><h3>Total Budget</h3><div class="value" id="total-budget">₹0</div></div>
+        <div class="card"><h3>Total Expense</h3><div class="value" id="total-expense">₹0</div></div>
+        <div class="card"><h3>Remaining</h3><div class="value" id="remaining-budget">₹0</div><div class="progress"><i id="progress-fill"></i></div></div>
+        <div class="card"><h3>Level</h3><div class="value" id="level">1</div><div class="progress"><i id="level-fill"></i></div><div id="badges" style="margin-top:8px"></div><div style="margin-top:6px;color:rgba(255,255,255,0.9)" id="streak">Streak: 0 days</div></div>
       </div>
-
-      <div style="display:flex;align-items:center;gap:8px">
-        <button class="menu-btn" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-        <nav id="main-nav" aria-label="Main navigation">
-          <a data-section="dashboard" class="nav-link active">Dashboard</a>
-          <a data-section="add-expense" class="nav-link">Add</a>
-          <a data-section="reports" class="nav-link">Reports</a>
-          <a data-section="emotions" class="nav-link">Emotions</a>
-          <a data-section="settings" class="nav-link">Settings</a>
-        </nav>
+      <div class="section"><div class="panel"><h3 style="margin-top:0">Recent</h3><ul id="recent-expenses" class="expense-list" aria-live="polite"></ul></div></div>
+      <div class="cards" style="margin-top:12px">
+        <div class="card"><h3>Savings Goal</h3><div class="value" id="goal-progress">₹0 / ₹0</div><div class="progress"><i id="goal-fill"></i></div></div>
+        <div class="card"><h3>Top Category</h3><div class="value" id="top-category">-</div></div>
       </div>
-    </header>
+    </section>
 
-    <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
-      <a data-section="dashboard">Dashboard</a>
-      <a data-section="add-expense">Add Expense</a>
-      <a data-section="reports">Reports</a>
-      <a data-section="emotions">Emotions</a>
-      <a data-section="settings">Settings</a>
-    </div>
-
-    <main>
-      <!-- DASHBOARD -->
-      <section id="dashboard" class="section active" aria-labelledby="dashboard">
-        <div class="cards" role="region" aria-label="summary cards">
-          <div class="card"><h3>Total Budget</h3><div class="value" id="total-budget">₹0</div></div>
-          <div class="card"><h3>Total Expense</h3><div class="value" id="total-expense">₹0</div></div>
-          <div class="card"><h3>Remaining</h3><div class="value" id="remaining-budget">₹0</div><div class="progress"><i id="progress-fill"></i></div></div>
-          <div class="card"><h3>Level</h3><div class="value" id="level">1</div><div class="progress"><i id="level-fill"></i></div><div id="badges" style="margin-top:8px"></div><div style="margin-top:6px;color:rgba(255,255,255,0.9)" id="streak">Streak: 0 days</div></div>
-        </div>
-
-        <div class="section"><div class="panel"><h3 style="margin-top:0">Recent</h3><ul id="recent-expenses" class="expense-list" aria-live="polite"></ul></div></div>
-
-        <div class="cards" style="margin-top:12px">
-          <div class="card"><h3>Savings Goal</h3><div class="value" id="goal-progress">₹0 / ₹0</div><div class="progress"><i id="goal-fill"></i></div></div>
-          <div class="card"><h3>Top Category</h3><div class="value" id="top-category">-</div></div>
-        </div>
-      </section>
-
-      <!-- ADD -->
-      <section id="add-expense" class="section" aria-labelledby="add-expense">
-        <div class="panel">
-          <h3 style="margin-top:0">Add Expense</h3>
-          <form id="expense-form" autocomplete="off">
-            <input id="name" type="text" placeholder="Expense name" required>
-            <div class="row">
-              <input id="amount" type="number" placeholder="Amount (₹)" required class="half">
-              <input id="date" type="date" placeholder="Date" required class="half">
-            </div>
-            <div class="row">
-              <select id="category" required class="half"><option value="">Category</option><option>Food</option><option>Transport</option><option>Shopping</option><option>Utilities</option><option>Others</option></select>
-              <select id="emotion" required class="half"><option value="">Emotion</option><option>Happy</option><option>Sad</option><option>Stressed</option><option>Excited</option><option>Angry</option></select>
-            </div>
-            <button class="primary" type="submit">Add Expense</button>
-          </form>
-
-          <div style="margin-top:10px">
-            <input id="search-expense" type="text" placeholder="Search expenses (name, category, emotion)..." style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%;background:transparent;color:#fff">
+    <!-- ADD EXPENSE -->
+    <section id="add-expense" class="section" aria-labelledby="add-expense">
+      <div class="panel">
+        <h3 style="margin-top:0">Add Expense</h3>
+        <form id="expense-form" autocomplete="off">
+          <input id="name" type="text" placeholder="Expense name" required>
+          <div class="row">
+            <input id="amount" type="number" placeholder="Amount (₹)" required class="half">
+            <input id="date" type="date" placeholder="Date" required class="half">
           </div>
-
-          <div style="margin-top:12px"><ul id="expense-list" class="expense-list" aria-live="polite"></ul></div>
+          <div class="row">
+            <select id="category" required class="half"><option value="">Category</option><option>Food</option><option>Transport</option><option>Shopping</option><option>Utilities</option><option>Others</option></select>
+            <select id="emotion" required class="half"><option value="">Emotion</option><option>Happy</option><option>Sad</option><option>Stressed</option><option>Excited</option><option>Angry</option></select>
+          </div>
+          <button class="primary" type="submit">Add Expense</button>
+        </form>
+        <div style="margin-top:10px">
+          <input id="search-expense" type="text" placeholder="Search expenses (name, category, emotion)..." style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%;background:transparent;color:#fff">
         </div>
-      </section>
+        <div style="margin-top:12px"><ul id="expense-list" class="expense-list" aria-live="polite"></ul></div>
+      </div>
+    </section>
 
-      <!-- REPORTS -->
-      <section id="reports" class="section" aria-labelledby="reports">
-        <div class="charts" style="margin-bottom:12px">
-          <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">By Category</h3><canvas id="categoryChart"></canvas></div>
-          <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">Monthly</h3><canvas id="monthlyChart"></canvas></div>
-        </div>
-        <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">Emotion Distribution</h3><canvas id="emotionChart"></canvas></div>
-      </section>
+    <!-- REPORTS -->
+    <section id="reports" class="section" aria-labelledby="reports">
+      <div class="charts" style="margin-bottom:12px">
+        <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">By Category</h3><canvas id="categoryChart"></canvas></div>
+        <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">Monthly</h3><canvas id="monthlyChart"></canvas></div>
+      </div>
+      <div class="chart-wrap chart-container panel"><h3 style="margin-top:0">Emotion Distribution</h3><canvas id="emotionChart"></canvas></div>
+    </section>
 
-      <!-- EMOTIONS -->
-      <section id="emotions" class="section" aria-labelledby="emotions">
-        <div class="panel"><h3 style="margin-top:0">Emotion Insights</h3><p id="emotion-insight" style="font-weight:600;color:#eaf7ff">No data yet — add expenses with emotions.</p></div>
-      </section>
+    <!-- EMOTIONS -->
+    <section id="emotions" class="section" aria-labelledby="emotions">
+      <div class="panel"><h3 style="margin-top:0">Emotion Insights</h3><p id="emotion-insight" style="font-weight:600;color:#eaf7ff">No data yet — add expenses with emotions.</p></div>
+    </section>
 
-      <!-- SETTINGS -->
-      <section id="settings" class="section" aria-labelledby="settings">
-        <div class="panel">
-          <h3 style="margin-top:0">Settings</h3>
-          <form id="budget-form">
-            <input id="new-budget" type="number" placeholder="Set total budget (₹)" required>
-            <input id="goal-amount" type="number" placeholder="Set savings goal (₹)" required>
-            <div style="display:flex;gap:8px;margin-top:6px"><button class="primary" type="submit">Save Budget & Goal</button><button class="ghost" id="export-btn" type="button">Export CSV</button></div>
-          </form>
-          <div style="margin-top:12px;display:flex;gap:8px"><button class="ghost" id="reset-btn">Reset All Data</button></div>
-        </div>
-      </section>
-    </main>
-  </div>
+    <!-- SETTINGS -->
+    <section id="settings" class="section" aria-labelledby="settings">
+      <div class="panel">
+        <h3 style="margin-top:0">Settings</h3>
+        <form id="budget-form">
+          <input id="new-budget" type="number" placeholder="Set total budget (₹)" required>
+          <input id="goal-amount" type="number" placeholder="Set savings goal (₹)" required>
+          <div style="display:flex;gap:8px;margin-top:6px"><button class="primary" type="submit">Save Budget & Goal</button><button class="ghost" id="export-btn" type="button">Export CSV</button></div>
+        </form>
+        <div style="margin-top:12px;display:flex;gap:8px"><button class="ghost" id="reset-btn">Reset All Data</button></div>
+      </div>
+    </section>
+  </main>
+</div>
 
-  <div id="challenge-popup" role="dialog" aria-modal="true"><div id="challenge-text" style="font-weight:700"></div><div style="margin-top:12px;text-align:center"><button onclick="closeChallenge()" class="primary">Got it</button></div></div>
+<div id="challenge-popup" role="dialog" aria-modal="true"><div id="challenge-text" style="font-weight:700"></div><div style="margin-top:12px;text-align:center"><button onclick="closeChallenge()" class="primary">Got it</button></div></div>
 
 <script>
-// ------------------ FULL JS INCLUDING NAV FIX ------------------
-document.addEventListener('DOMContentLoaded', ()=>{
-  // NAVIGATION
-  const navLinks = document.querySelectorAll('.nav-link');
-  const mobileNavLinks = document.querySelectorAll('.mobile-nav a');
-  const sections = document.querySelectorAll('main section');
-  const hamburger = document.getElementById('hamburger');
-  const mobileNav = document.getElementById('mobile-nav');
-
-  function showSection(id){
-    sections.forEach(s=>s.classList.remove('active'));
-    const section = document.getElementById(id);
-    if(section) section.classList.add('active');
-    navLinks.forEach(a=>a.classList.toggle('active', a.dataset.section===id));
-    mobileNavLinks.forEach(a=>a.classList.toggle('active', a.dataset.section===id));
-    mobileNav.classList.remove('show');
-    if(id==='dashboard') updateDashboard();
-    if(id==='reports') setTimeout(updateCharts,50);
-    if(id==='emotions') setTimeout(updateEmotionAnalysis,50);
-  }
-
-  navLinks.forEach(a=>a.addEventListener('click', ()=> showSection(a.dataset.section)));
-  mobileNavLinks.forEach(a=>a.addEventListener('click', ()=> showSection(a.dataset.section)));
-  hamburger.addEventListener('click', ()=> mobileNav.classList.toggle('show'));
-
-  // initialize
-  showSection('dashboard');
-});
-
-
-/* -------- DATA STORAGE -------- */
-let expenses = JSON.parse(localStorage.getItem('expenses')||'[]');
-let budget = parseFloat(localStorage.getItem('budget')||0);
-let goal = parseFloat(localStorage.getItem('goal')||0);
-let streak = parseInt(localStorage.getItem('streak')||0);
-let level = parseInt(localStorage.getItem('level')||1);
-let badges = JSON.parse(localStorage.getItem('badges')||'[]');
-
-/* -------- DOM ELEMENTS -------- */
-const totalBudgetEl = document.getElementById('total-budget');
-const totalExpenseEl = document.getElementById('total-expense');
-const remainingBudgetEl = document.getElementById('remaining-budget');
-const progressFill = document.getElementById('progress-fill');
-const goalFill = document.getElementById('goal-fill');
-const goalProgress = document.getElementById('goal-progress');
-const levelEl = document.getElementById('level');
-const levelFill = document.getElementById('level-fill');
-const badgesEl = document.getElementById('badges');
-const streakEl = document.getElementById('streak');
-const recentEl = document.getElementById('recent-expenses');
-const expenseListEl = document.getElementById('expense-list');
-const searchInput = document.getElementById('search-expense');
-const emotionInsightEl = document.getElementById('emotion-insight');
-const categoryChartCtx = document.getElementById('categoryChart').getContext('2d');
-const monthlyChartCtx = document.getElementById('monthlyChart').getContext('2d');
-const emotionChartCtx = document.getElementById('emotionChart').getContext('2d');
-
-/* -------- CHARTS -------- */
-let categoryChart, monthlyChart, emotionChart;
+/* ---------- STATE ---------- */
+let expenses=JSON.parse(localStorage.getItem('expenses')||'[]');
+let budget=parseFloat(localStorage.getItem('budget')||'0');
+let goal=parseFloat(localStorage.getItem('goal')||'0');
+let level=1, streak=0, badges=[];
+const levels=[0,1000,3000,6000,10000,15000];
+/* ---------- UTILS ---------- */
+function saveState(){localStorage.setItem('expenses',JSON.stringify(expenses));localStorage.setItem('budget',budget);localStorage.setItem('goal',goal);}
+function addExpense(e){e.preventDefault();
+const name=document.getElementById('name').value;
+const amount=parseFloat(document.getElementById('amount').value);
+const date=document.getElementById('date').value;
+const category=document.getElementById('category').value;
+const emotion=document.getElementById('emotion').value;
+if(!name||!amount||!date||!category||!emotion)return;
+expenses.push({name,amount,date,category,emotion});
+document.getElementById('expense-form').reset();
+saveState();render();triggerConfetti();checkChallenges();}
+function render(){/* DASHBOARD */
+const total=expenses.reduce((a,b)=>a+b.amount,0);
+document.getElementById('total-expense').textContent=`₹${total}`;
+document.getElementById('remaining-budget').textContent=`₹${Math.max(budget-total,0)}`;
+document.getElementById('progress-fill').style.width=Math.min(total/budget*100,100)+'%';
+document.getElementById('goal-progress').textContent=`₹${Math.min(total,goal)} / ₹${goal}`;
+document.getElementById('goal-fill').style.width=Math.min(total/goal*100,100)+'%';
+/* Level */
+level=levels.findIndex(l=>total<l); if(level<0)level=levels.length; document.getElementById('level').textContent=level;
+document.getElementById('level-fill').style.width=(total/levels[level-1]||0)*100+'%';
+/* Streak & badges */
+document.getElementById('streak').textContent=`Streak: ${streak} days`;
+document.getElementById('badges').textContent=badges.join(' ');
+/* Top category */
+const cats={};expenses.forEach(e=>{cats[e.category]=(cats[e.category]||0)+e.amount}); 
+const topCat=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0]; 
+document.getElementById('top-category').textContent=topCat?topCat[0]:'-';
+/* Recent */
+const recent=expenses.slice(-5).reverse();
+const recentList=document.getElementById('recent-expenses');recentList.innerHTML='';
+recent.forEach(e=>{const li=document.createElement('li');li.className='expense';
+li.innerHTML=`<div class="meta"><span class="name">${e.name}</span><span class="small">${e.category} • ${e.emotion} • ${e.date}</span></div><div>₹${e.amount}</div>`;recentList.appendChild(li);});
+/* Expense list */
+const listEl=document.getElementById('expense-list');listEl.innerHTML='';
+expenses.forEach((e,i)=>{const li=document.createElement('li');li.className='expense';
+li.innerHTML=`<div class="meta"><span class="name">${e.name}</span><span class="small">${e.category} • ${e.emotion} • ${e.date}</span></div>
+<button class="ghost" onclick="deleteExpense(${i})">Delete</button>`;listEl.appendChild(li);});
+/* Charts */
+updateCharts();}
+function deleteExpense(i){expenses.splice(i,1);saveState();render();}
 function updateCharts(){
-  const catData = {}, monthData = {}, emoData={};
-  expenses.forEach(e=>{
-    catData[e.category] = (catData[e.category]||0)+e.amount;
-    const m = new Date(e.date).toLocaleString('default',{month:'short'});
-    monthData[m] = (monthData[m]||0)+e.amount;
-    emoData[e.emotion] = (emoData[e.emotion]||0)+1;
-  });
-
-  const catLabels = Object.keys(catData), catValues = Object.values(catData);
-  const monthLabels = Object.keys(monthData), monthValues = Object.values(monthData);
-  const emoLabels = Object.keys(emoData), emoValues = Object.values(emoData);
-
-  if(categoryChart) categoryChart.destroy();
-  categoryChart = new Chart(categoryChartCtx,{type:'pie',data:{labels:catLabels,datasets:[{data:catValues,backgroundColor:['#4a90e2','#50e3c2','#f5a623','#d0021b','#9013fe']}]},options:{plugins:{legend:{position:'bottom'}}}});
-  
-  if(monthlyChart) monthlyChart.destroy();
-  monthlyChart = new Chart(monthlyChartCtx,{type:'bar',data:{labels:monthLabels,datasets:[{label:'Monthly Expense',data:monthValues,backgroundColor:'#50e3c2'}]},options:{scales:{y:{beginAtZero:true}}}});
-  
-  if(emotionChart) emotionChart.destroy();
-  emotionChart = new Chart(emotionChartCtx,{type:'doughnut',data:{labels:emoLabels,datasets:[{data:emoValues,backgroundColor:['#4a90e2','#50e3c2','#f5a623','#d0021b','#9013fe']}]},options:{plugins:{legend:{position:'bottom'}}}});
-}
-
-/* -------- RENDER UI -------- */
-function render(){
-  const totalExp = expenses.reduce((a,e)=>a+e.amount,0);
-  totalBudgetEl.textContent = `₹${budget}`;
-  totalExpenseEl.textContent = `₹${totalExp}`;
-  const remaining = Math.max(budget-totalExp,0);
-  remainingBudgetEl.textContent = `₹${remaining}`;
-  const prog = budget>0? Math.min((totalExp/budget)*100,100):0;
-  progressFill.style.width = prog+'%';
-
-  goalProgress.textContent = `₹${Math.min(totalExp,goal)} / ₹${goal}`;
-  goalFill.style.width = goal>0? Math.min((totalExp/goal)*100,100)+'%':'0%';
-
-  levelEl.textContent = level;
-  levelFill.style.width = Math.min(level*10,100)+'%';
-  badgesEl.innerHTML = badges.map(b=>`<span style="font-size:16px;margin-right:4px">${b}</span>`).join('');
-  streakEl.textContent = `Streak: ${streak} days`;
-
-  recentEl.innerHTML = expenses.slice(-5).reverse().map(e=>`<li class="expense"><div class="meta"><div class="name">${e.name}</div><div class="small">${e.category} • ${e.emotion} • ${e.date}</div></div><div class="value">₹${e.amount}</div></li>`).join('');
-  
-  renderExpenseList(expenses);
-  renderEmotionInsights();
-  updateCharts();
-}
-function renderExpenseList(list){
-  const q = searchInput.value.toLowerCase();
-  expenseListEl.innerHTML = list.filter(e=>e.name.toLowerCase().includes(q)||e.category.toLowerCase().includes(q)||e.emotion.toLowerCase().includes(q))
-    .map(e=>`<li class="expense"><div class="meta"><div class="name">${e.name}</div><div class="small">${e.category} • ${e.emotion} • ${e.date}</div></div><div class="value">₹${e.amount}</div></li>`).join('');
-}
-
-/* -------- EMOTIONS INSIGHTS -------- */
-function renderEmotionInsights(){
-  const emoCount = {};
-  expenses.forEach(e=>emoCount[e.emotion]=(emoCount[e.emotion]||0)+1);
-  const entries = Object.entries(emoCount).sort((a,b)=>b[1]-a[1]);
-  emotionInsightEl.textContent = entries.length? `Most frequent emotion: ${entries[0][0]}` : "No data yet — add expenses with emotions.";
-}
-
-/* -------- FORM HANDLERS -------- */
-document.getElementById('expense-form').addEventListener('submit', e=>{
-  e.preventDefault();
-  const name=document.getElementById('name').value;
-  const amount=parseFloat(document.getElementById('amount').value);
-  const date=document.getElementById('date').value;
-  const category=document.getElementById('category').value;
-  const emotion=document.getElementById('emotion').value;
-  const newExpense={name,amount,date,category,emotion};
-  expenses.push(newExpense);
-  localStorage.setItem('expenses',JSON.stringify(expenses));
-  document.getElementById('expense-form').reset();
-  updateLevel(newExpense);
-  render();
+const ctxC=document.getElementById('categoryChart').getContext('2d');
+const ctxM=document.getElementById('monthlyChart').getContext('2d');
+const ctxE=document.getElementById('emotionChart').getContext('2d');
+const catData={},monthData={},emoData={};
+expenses.forEach(e=>{
+  catData[e.category]=(catData[e.category]||0)+e.amount;
+  const m=(new Date(e.date)).toLocaleString('default',{month:'short',year:'numeric'});
+  monthData[m]=(monthData[m]||0)+e.amount;
+  emoData[e.emotion]=(emoData[e.emotion]||0)+1;
 });
-
-function updateLevel(exp){
-  const totalExp = expenses.reduce((a,e)=>a+e.amount,0);
-  const oldLevel = level;
-  level = 1 + Math.floor(totalExp/1000);
-  if(level>oldLevel){
-    badges.push('🏆');
-    triggerConfetti();
-  }
-  localStorage.setItem('level',level);
-  localStorage.setItem('badges',JSON.stringify(badges));
+if(window.categoryChart)window.categoryChart.destroy();
+window.categoryChart=new Chart(ctxC,{type:'pie',data:{labels:Object.keys(catData),datasets:[{data:Object.values(catData),backgroundColor:['#4a90e2','#50e3c2','#ff9f43','#f5a623','#e94e77']}]},options:{responsive:true}});
+if(window.monthlyChart)window.monthlyChart.destroy();
+window.monthlyChart=new Chart(ctxM,{type:'bar',data:{labels:Object.keys(monthData),datasets:[{label:'Expense',data:Object.values(monthData),backgroundColor:'#4a90e2'}]},options:{responsive:true}});
+if(window.emotionChart)window.emotionChart.destroy();
+window.emotionChart=new Chart(ctxE,{type:'doughnut',data:{labels:Object.keys(emoData),datasets:[{data:Object.values(emoData),backgroundColor:['#50e3c2','#e94e77','#f5a623','#4a90e2','#ff9f43']}]},options:{responsive:true}});
+/* Emotion insight */
+const maxE=Object.entries(emoData).sort((a,b)=>b[1]-a[1])[0];
+document.getElementById('emotion-insight').textContent=maxE?`Most expressed emotion: ${maxE[0]}`:'No data yet — add expenses with emotions.';
 }
-
-/* -------- SEARCH -------- */
-searchInput.addEventListener('input',()=>renderExpenseList(expenses));
-
-/* -------- BUDGET & GOAL -------- */
-document.getElementById('budget-form').addEventListener('submit', e=>{
-  e.preventDefault();
-  budget = parseFloat(document.getElementById('new-budget').value);
-  goal = parseFloat(document.getElementById('goal-amount').value);
-  localStorage.setItem('budget',budget);
-  localStorage.setItem('goal',goal);
-  render();
-});
-
-/* -------- EXPORT CSV -------- */
-document.getElementById('export-btn').addEventListener('click', ()=>{
-  if(!expenses.length) return alert("No data to export!");
-  let csv='Name,Amount,Date,Category,Emotion\n';
-  expenses.forEach(e=>csv+=`${e.name},${e.amount},${e.date},${e.category},${e.emotion}\n`);
-  const blob=new Blob([csv],{type:'text/csv'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download='expenses.csv'; a.click(); URL.revokeObjectURL(url);
-});
-
-/* -------- RESET -------- */
-document.getElementById('reset-btn').addEventListener('click', ()=>{
-  if(confirm("Reset all data?")){
-    localStorage.clear(); location.reload();
-  }
-});
-
-/* -------- CHALLENGE & CONFETTI -------- */
-const challengePopup = document.getElementById('challenge-popup');
-function triggerConfetti(){
-  challengePopup.style.display='block';
-  const colors = ['#4a90e2','#50e3c2','#f5a623','#d0021b','#9013fe'];
-  for(let i=0;i<100;i++){
-    const div=document.createElement('div'); div.className='confetti';
-    div.style.background=colors[Math.floor(Math.random()*colors.length)];
-    div.style.left=Math.random()*window.innerWidth+'px';
-    div.style.top=Math.random()*window.innerHeight+'px';
-    div.style.width=div.style.height=Math.random()*6+4+'px';
-    document.body.appendChild(div);
-    setTimeout(()=>div.remove(),3000+Math.random()*3000);
-  }
-}
-function closeChallenge(){challengePopup.style.display='none';}
-
-/* -------- INITIAL RENDER -------- */
+/* ---------- EVENTS ---------- */
+document.getElementById('expense-form').addEventListener('submit',addExpense);
+document.getElementById('budget-form').addEventListener('submit',e=>{e.preventDefault();budget=parseFloat(document.getElementById('new-budget').value)||0;goal=parseFloat(document.getElementById('goal-amount').value)||0;saveState();render();});
+document.getElementById('reset-btn').addEventListener('click',()=>{if(confirm('Reset all data?')){expenses=[];budget=0;goal=0;saveState();render();}});
+document.getElementById('export-btn').addEventListener('click',()=>{let csv='Name,Amount,Category,Emotion,Date\n';expenses.forEach(e=>{csv+=`${e.name},${e.amount},${e.category},${e.emotion},${e.date}\n`}); const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='expenses.csv';a.click();URL.revokeObjectURL(url);});
+document.getElementById('search-expense').addEventListener('input',e=>{const term=e.target.value.toLowerCase();Array.from(document.getElementById('expense-list').children).forEach(li=>{const text=li.querySelector('.name').textContent.toLowerCase()+li.querySelector('.small').textContent.toLowerCase();li.style.display=text.includes(term)?'flex':'none'})});
+/* NAVIGATION */
+function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-link').forEach(a=>a.classList.remove('active'));document.querySelectorAll('.nav-link').forEach(a=>{if(a.dataset.section===id)a.classList.add('active');});closeMobileNav();}
+document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click',()=>showSection(a.dataset.section)));
+document.getElementById('hamburger').addEventListener('click',()=>{document.getElementById('mobile-nav').classList.toggle('show');});
+function closeMobileNav(){document.getElementById('mobile-nav').classList.remove('show');}
+document.querySelectorAll('.mobile-nav a').forEach(a=>a.addEventListener('click',()=>showSection(a.dataset.section)));
+/* ---------- CONFETTI ---------- */
+function triggerConfetti(){for(let i=0;i<30;i++){const c=document.createElement('div');c.className='confetti';c.style.backgroundColor=['#4a90e2','#50e3c2','#ff9f43','#f5a623','#e94e77'][Math.floor(Math.random()*5)];c.style.left=Math.random()*100+'vw';c.style.top='-4px';document.body.appendChild(c);let dx=(Math.random()-0.5)*5,dy=2+Math.random()*5;let op=1;const anim=setInterval(()=>{c.style.top=parseFloat(c.style.top)+dy+'px';c.style.left=parseFloat(c.style.left)+dx+'px';op-=0.01;c.style.opacity=op;if(op<=0){clearInterval(anim);c.remove()}},16);}}
+/* ---------- CHALLENGES ---------- */
+function checkChallenges(){if(expenses.length>0&&expenses.length%5===0)showChallenge(`Congrats! You added ${expenses.length} expenses!`);}
+function showChallenge(text){document.getElementById('challenge-text').textContent=text;document.getElementById('challenge-popup').style.display='block';}
+function closeChallenge(){document.getElementById('challenge-popup').style.display='none';}
 render();
 </script>
 </body>
 </html>
-
-
