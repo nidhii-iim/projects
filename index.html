@@ -1,404 +1,638 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>Premium Mobile Budget Tracker</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* --- Global & Fonts --- */
-body {
-  margin:0;
-  font-family:'Inter',sans-serif;
-  color:#222;
-  overflow-x:hidden;
-  position:relative;
-  min-height:100vh;
-  background: radial-gradient(circle at 20% 20%, #dff1ff, #ffffff 60%) no-repeat,
-              radial-gradient(circle at 80% 80%, #ffe0f0, #ffffff 70%) no-repeat;
-  background-attachment: fixed;
-}
+  /* ---------- BASE ---------- */
+  :root{
+    --bg1:#0f1724;
+    --accent1:#4a90e2;
+    --accent2:#50e3c2;
+    --glass: rgba(255,255,255,0.08);
+    --glass-strong: rgba(255,255,255,0.14);
+    --muted: rgba(255,255,255,0.75);
+    --success: #2ecc71;
+    --danger: #e74c3c;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    background: linear-gradient(120deg,var(--bg1) 0%, #122233 60%, #0b2233 100%);
+    color: #fff;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-y:auto;
+  }
 
-/* Subtle mesh effect */
-body::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  background: url('https://www.transparenttextures.com/patterns/cubes.png');
-  opacity:0.04;
-  z-index:0;
-}
+  /* ---------- REALISTIC BACKGROUND: subtle wave + vignette + particles ---------- */
+  /* gentle animated SVG wave (keeps lightweight) */
+  .bg-wrap{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .bg-wave{position:absolute;left:50%;transform:translateX(-50%);bottom:-10vh;width:160vw;height:60vh;opacity:0.12;filter:blur(22px)}
+  .bg-vignette{position:fixed;inset:0;background:radial-gradient(1000px 600px at 10% 10%, rgba(255,255,255,0.02), transparent 10%), radial-gradient(900px 500px at 90% 90%, rgba(255,255,255,0.02), transparent 12%);pointer-events:none;z-index:0}
+  /* particles: few, slow */
+  .particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .particle{position:absolute;border-radius:50%;opacity:0.06;background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.1));animation:float 22s linear infinite}
+  @keyframes float{0%{transform:translateY(100vh) translateX(0) scale(.6)}50%{transform:translateY(40vh) translateX(30vw) scale(1)}100%{transform:translateY(-10vh) translateX(60vw) scale(.6)}}
 
-/* --- Navigation --- */
-nav {
-  background: rgba(255,255,255,0.5);
-  backdrop-filter: blur(12px);
-  color:#222;
-  padding:15px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:sticky;
-  top:0;
-  z-index:100;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-}
-nav h1 {font-size:1.5rem;font-weight:700;margin:0;}
-nav ul {list-style:none;display:flex;gap:15px;flex-wrap:wrap;padding:0;margin:0;}
-nav ul li a {color:#222;text-decoration:none;font-weight:600;padding:5px 10px;border-radius:8px;transition:0.3s;}
-nav ul li a:hover {background:rgba(0,0,0,0.05);}
+  /* ---------- LAYOUT ---------- */
+  .app {position:relative;z-index:1;max-width:980px;margin:0 auto;padding:14px 16px 72px;}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px; margin-bottom:10px}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{
+    width:44px;height:44px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent1),var(--accent2));
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:#062433;box-shadow:0 6px 18px rgba(0,0,0,0.4)
+  }
+  h1{font-size:1.05rem;margin:0}
+  /* hamburger */
+  .menu-btn{display:none;flex-direction:column;gap:4px;padding:8px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.02);cursor:pointer}
+  .menu-btn span{width:20px;height:2px;background:linear-gradient(90deg,#fff,rgba(255,255,255,0.8));display:block;border-radius:2px}
 
-/* --- Sections --- */
-main {max-width:1000px;margin:20px auto;padding:0 15px; position:relative; z-index:1;}
-section {display:none;animation:fadeIn 0.5s;}
-section.active {display:block;}
-@keyframes fadeIn {from{opacity:0; transform:translateY(10px);}to{opacity:1; transform:translateY(0);}}
+  nav{display:flex;gap:8px;align-items:center}
+  nav a{padding:8px 12px;border-radius:12px;text-decoration:none;color:rgba(255,255,255,0.9);font-weight:600;cursor:pointer}
+  nav a.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#052a34;box-shadow:0 8px 26px rgba(74,144,226,0.14)}
 
-/* --- Glass Cards --- */
-.cards {display:flex; gap:15px; flex-wrap:wrap; margin-bottom:25px;}
-.card {
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(15px);
-  padding:20px;
-  border-radius:20px;
-  flex:1; min-width:200px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.08);
-  text-align:center;
-  transition: all 0.3s ease;
-}
-.card:hover {transform:translateY(-5px);box-shadow:0 8px 30px rgba(0,0,0,0.12);}
-.card h3 {margin-bottom:8px;font-size:1.1rem;color:#333;}
-.card p {font-size:1.3rem;font-weight:700;margin-bottom:5px;color:#111;}
-.progress-bar {
-  height:12px;background:rgba(0,0,0,0.1);
-  border-radius:10px;overflow:hidden;margin-top:8px;
-}
-#progress-fill,#level-fill,#goal-fill {
-  height:100%;width:0%;background:linear-gradient(90deg,#4a90e2,#50e3c2);
-  transition:width 1s ease;
-  border-radius:10px;
-}
+  /* ---------- GRID & CARDS ---------- */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+  .card{
+    background:var(--glass);
+    border-radius:14px;padding:12px;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.45);
+    backdrop-filter: blur(8px);
+    border:1px solid rgba(255,255,255,0.03);
+    transition:transform .22s, box-shadow .22s;
+  }
+  .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,23,0.6)}
+  .card h3{margin:0;font-size:0.9rem;font-weight:600;color:#e6f7ff}
+  .card .value{font-weight:700;font-size:1.15rem;margin-top:6px;color:#fff}
 
-/* --- Forms --- */
-form {
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(12px);
-  padding:20px;
-  border-radius:20px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.08);
-  margin-bottom:25px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-form input, form select {
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  flex:1 1 100%;
-  font-size:1rem;
-  background: rgba(0,0,0,0.05);
-  color:#222;
-}
-form input::placeholder {color:#666;}
-form button {
-  background: linear-gradient(135deg,#4a90e2,#50e3c2);
-  color:white;
-  border:none;
-  padding:12px 20px;
-  border-radius:30px;
-  cursor:pointer;
-  transition:all 0.3s;
-  font-size:1rem;
-  font-weight:600;
-}
-form button:hover {transform:scale(1.05);box-shadow:0 5px 15px rgba(0,0,0,0.2);}
+  /* progress small */
+  .progress{height:10px;background:rgba(255,255,255,0.06);border-radius:999px;margin-top:8px;overflow:hidden}
+  .progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width .8s ease}
 
-/* --- Expense Lists --- */
-#expense-list,#recent-expenses{margin-top:15px;list-style:none;padding:0;}
-#expense-list li,#recent-expenses li {
-  background: rgba(255,255,255,0.9);
-  padding:12px 15px;
-  margin-bottom:10px;
-  border-radius:12px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  box-shadow:0 3px 10px rgba(0,0,0,0.08);
-  flex-wrap:wrap;
-}
-.delete-btn {
-  background:#e74c3c;
-  color:white;
-  border:none;
-  border-radius:8px;
-  padding:6px 12px;
-  cursor:pointer;
-  transition:all 0.3s;
-}
-.delete-btn:hover {transform:scale(1.05);}
+  /* content area */
+  .section{margin-top:8px}
+  .panel{
+    background:var(--glass-strong);border-radius:14px;padding:12px;
+    box-shadow:0 12px 28px rgba(2,6,23,0.45);
+    border:1px solid rgba(255,255,255,0.04);
+  }
 
-/* --- Charts --- */
-.chart-container {
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(10px);
-  padding:20px;
-  border-radius:20px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.08);
-  margin-bottom:25px;
-}
+  /* form styles (mobile-friendly full width) */
+  form{display:flex;flex-direction:column;gap:10px}
+  .row{display:flex;gap:8px;align-items:center}
+  .row .half{flex:1}
+  input[type=text], input[type=number], input[type=date], select{
+    width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);
+    background:rgba(0,0,0,0.12);color:#fff;font-size:14px;
+  }
+  button.primary{
+    padding:12px 16px;border-radius:999px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:#062433;font-weight:700;cursor:pointer;box-shadow:0 10px 30px rgba(74,144,226,0.12);
+  }
+  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#fff;padding:10px 12px;border-radius:10px}
 
-/* --- Responsive --- */
-@media(max-width:768px){
-  .cards{flex-direction:column;}
-  form input, form select, form button{flex:1 1 100%;}
-  #expense-list li,#recent-expenses li{flex-direction:column;align-items:flex-start;}
-  nav{flex-direction:column;align-items:flex-start;}
-}
+  /* expense list */
+  ul.expense-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+  li.expense{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border-radius:10px;background:rgba(0,0,0,0.16);
+    border:1px solid rgba(255,255,255,0.03)
+  }
+  .meta{display:flex;flex-direction:column;gap:4px}
+  .meta .name{font-weight:600}
+  .meta .small{font-size:12px;color:rgba(255,255,255,0.75)}
 
+  /* charts container horizontal scroll on mobile */
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .chart-wrap{min-width:280px;border-radius:12px;overflow:hidden}
+
+  /* challenge popup */
+  #challenge-popup{position:fixed;left:50%;top:18%;transform:translateX(-50%);z-index:1200;display:none;padding:14px;border-radius:14px;background:linear-gradient(180deg,#ffffff, #f7f7f7);color:#112;box-shadow:0 18px 40px rgba(2,6,23,0.6)}
+
+  /* small confetti shapes */
+  .confetti{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;z-index:1200;opacity:0.95}
+
+  /* responsiveness for mobile */
+  @media (max-width:900px){
+    .cards{grid-template-columns:repeat(2,1fr)}
+    .charts{grid-template-columns:1fr}
+  }
+  @media (max-width:520px){
+    .brand h1{display:none}
+    .menu-btn{display:flex}
+    nav{display:none}
+    .cards{grid-template-columns:1fr}
+    .app{padding:12px}
+    .chart-wrap{min-width:320px}
+  }
+
+  /* hamburger open nav mobile */
+  .mobile-nav{position:fixed;top:68px;left:8px;right:8px;background:var(--glass);backdrop-filter:blur(8px);border-radius:12px;padding:8px;display:none;z-index:150}
+  .mobile-nav a{display:block;padding:10px;border-radius:8px;color:#eaf7ff}
+  .mobile-nav.show{display:block}
+
+  /* fine touch targets */
+  button, a {touch-action:manipulation}
 </style>
 </head>
 <body>
 
-<!-- Floating particles -->
-<div class="particle" style="width:30px;height:30px;left:5%;animation-duration:25s;"></div>
-<div class="particle" style="width:50px;height:50px;left:25%;animation-duration:20s;"></div>
-<div class="particle" style="width:40px;height:40px;left:50%;animation-duration:22s;"></div>
-<div class="particle" style="width:60px;height:60px;left:75%;animation-duration:30s;"></div>
-
-<!-- Navigation -->
-<nav>
-  <h1>Budget Tracker</h1>
-  <ul>
-    <li><a onclick="showSection('dashboard')">Dashboard</a></li>
-    <li><a onclick="showSection('add-expense')">Add Expense</a></li>
-    <li><a onclick="showSection('reports')">Reports</a></li>
-    <li><a onclick="showSection('emotions')">Emotions</a></li>
-    <li><a onclick="showSection('settings')">Settings</a></li>
-  </ul>
-</nav>
-
-<main>
-<section id="dashboard" class="active">
-  <h2>Dashboard</h2>
-  <div class="cards">
-    <div class="card"><h3>Total Budget</h3><p id="total-budget">₹0</p></div>
-    <div class="card"><h3>Total Expense</h3><p id="total-expense">₹0</p></div>
-    <div class="card"><h3>Remaining</h3><p id="remaining-budget">₹0</p><div class="progress-bar"><div id="progress-fill"></div></div></div>
-    <div class="card"><h3>Level: <span id="level">1</span></h3><div class="progress-bar"><div id="level-fill"></div></div><div id="badges"></div><p id="streak" class="streak"></p></div>
+<!-- realistic background -->
+<div class="bg-wrap">
+  <svg class="bg-wave" viewBox="0 0 1200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a90e2"/><stop offset="1" stop-color="#50e3c2"/></linearGradient></defs>
+    <path d="M0,200 C150,120 350,40 600,60 C850,80 1050,160 1200,140 L1200 200 L0 200 Z" fill="url(#g1)"/>
+  </svg>
+  <div class="bg-vignette"></div>
+  <div class="particles" aria-hidden="true">
+    <div class="particle" style="width:22px;height:22px;left:6%;top:30%;animation-duration:32s"></div>
+    <div class="particle" style="width:30px;height:30px;left:82%;top:60%;animation-duration:26s"></div>
+    <div class="particle" style="width:16px;height:16px;left:48%;top:12%;animation-duration:28s"></div>
   </div>
-  <h3>Recent Expenses</h3>
-  <ul id="recent-expenses"></ul>
-  <div class="cards">
-    <div class="card"><h3>Savings Goal</h3><p id="goal-progress">₹0 / ₹0</p><div class="progress-bar"><div id="goal-fill"></div></div></div>
-    <div class="card"><h3>Top Category</h3><p id="top-category">-</p></div>
+</div>
+
+<div class="app" role="application" aria-label="Budget tracker app">
+  <header>
+    <div class="brand">
+      <div class="logo">BT</div>
+      <div>
+        <h1>Budget Tracker</h1>
+        <div style="font-size:12px;color:rgba(255,255,255,0.75)">Smart • Gamified • Emotion-aware</div>
+      </div>
+    </div>
+
+    <!-- hamburger (mobile) -->
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="menu-btn" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <nav id="main-nav" aria-label="Main navigation">
+        <a onclick="showSection('dashboard')" class="active">Dashboard</a>
+        <a onclick="showSection('add-expense')">Add</a>
+        <a onclick="showSection('reports')">Reports</a>
+        <a onclick="showSection('emotions')">Emotions</a>
+        <a onclick="showSection('settings')">Settings</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- mobile nav -->
+  <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+    <a onclick="mobileNavGo('dashboard')">Dashboard</a>
+    <a onclick="mobileNavGo('add-expense')">Add Expense</a>
+    <a onclick="mobileNavGo('reports')">Reports</a>
+    <a onclick="mobileNavGo('emotions')">Emotions</a>
+    <a onclick="mobileNavGo('settings')">Settings</a>
   </div>
-</section>
 
-<section id="add-expense">
-<h2>Add Expense</h2>
-<form id="expense-form">
-<input type="text" id="name" placeholder="Expense Name" required>
-<input type="number" id="amount" placeholder="Amount (₹)" required>
-<input type="date" id="date" required>
-<select id="category" required>
-<option value="">Select Category</option>
-<option value="Food">Food</option>
-<option value="Transport">Transport</option>
-<option value="Shopping">Shopping</option>
-<option value="Others">Others</option>
-</select>
-<select id="emotion" required>
-<option value="">How are you feeling?</option>
-<option value="Happy">😊 Happy</option>
-<option value="Sad">😢 Sad</option>
-<option value="Stressed">😫 Stressed</option>
-<option value="Excited">🤩 Excited</option>
-<option value="Angry">😡 Angry</option>
-</select>
-<button type="submit">Add Expense</button>
-</form>
-<input type="text" id="search-expense" placeholder="Search Expenses...">
-<ul id="expense-list"></ul>
-</section>
+  <!-- CONTENT -->
+  <main>
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section active" aria-labelledby="dashboard">
+      <div class="cards" role="region" aria-label="summary cards">
+        <div class="card">
+          <h3>Total Budget</h3>
+          <div class="value" id="total-budget">₹0</div>
+        </div>
+        <div class="card">
+          <h3>Total Expense</h3>
+          <div class="value" id="total-expense">₹0</div>
+        </div>
+        <div class="card">
+          <h3>Remaining</h3>
+          <div class="value" id="remaining-budget">₹0</div>
+          <div class="progress"><i id="progress-fill"></i></div>
+        </div>
+        <div class="card">
+          <h3>Level <small style="color:rgba(255,255,255,0.8)">(points)</small></h3>
+          <div class="value" id="level">1</div>
+          <div class="progress"><i id="level-fill"></i></div>
+          <div id="badges" style="margin-top:8px"></div>
+          <div style="margin-top:6px;color:rgba(255,255,255,0.9)" id="streak">Streak: 0 days</div>
+        </div>
+      </div>
 
-<section id="reports">
-<h2>Expense Reports</h2>
-<div class="chart-container"><canvas id="categoryChart"></canvas></div>
-<div class="chart-container"><canvas id="monthlyChart"></canvas></div>
-<div class="chart-container"><canvas id="emotionChart"></canvas></div>
-</section>
+      <div class="section">
+        <div class="panel">
+          <h3 style="margin-top:0">Recent</h3>
+          <ul id="recent-expenses" class="expense-list" aria-live="polite"></ul>
+        </div>
+      </div>
 
-<section id="emotions">
-<h2>Emotion Analysis</h2>
-<p id="emotion-insight" style="font-weight:bold;"></p>
-</section>
+      <div class="cards" style="margin-top:12px">
+        <div class="card">
+          <h3>Savings Goal</h3>
+          <div class="value" id="goal-progress">₹0 / ₹0</div>
+          <div class="progress"><i id="goal-fill"></i></div>
+        </div>
+        <div class="card">
+          <h3>Top Category</h3>
+          <div class="value" id="top-category">-</div>
+        </div>
+      </div>
+    </section>
 
-<section id="settings">
-<h2>Settings</h2>
-<form id="budget-form">
-<input type="number" id="new-budget" placeholder="Set Total Budget (₹)" required>
-<input type="number" id="goal-amount" placeholder="Set Savings Goal (₹)" required>
-<button type="submit">Save Budget & Goal</button>
-</form>
-<button id="reset-btn">Reset All Data</button>
-<button id="export-btn">Export CSV</button>
-</section>
+    <!-- ADD -->
+    <section id="add-expense" class="section" aria-labelledby="add-expense">
+      <div class="panel">
+        <h3 style="margin-top:0">Add Expense</h3>
+        <form id="expense-form" autocomplete="off">
+          <input id="name" type="text" placeholder="Expense name" required>
+          <div class="row">
+            <input id="amount" type="number" placeholder="Amount (₹)" required class="half">
+            <input id="date" type="date" placeholder="Date" required class="half">
+          </div>
+          <div class="row">
+            <select id="category" required class="half">
+              <option value="">Category</option>
+              <option>Food</option><option>Transport</option><option>Shopping</option><option>Utilities</option><option>Others</option>
+            </select>
+            <select id="emotion" required class="half">
+              <option value="">Emotion</option>
+              <option>Happy</option><option>Sad</option><option>Stressed</option><option>Excited</option><option>Angry</option>
+            </select>
+          </div>
+          <button class="primary" type="submit">Add Expense</button>
+        </form>
 
-<div id="challenge-popup"><p id="challenge-text"></p><button onclick="closeChallenge()">Close</button></div>
+        <div style="margin-top:10px">
+          <input id="search-expense" type="text" placeholder="Search expenses (name, category, emotion)..." style="padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);width:100%;background:transparent;color:#fff">
+        </div>
+
+        <div style="margin-top:12px">
+          <ul id="expense-list" class="expense-list" aria-live="polite"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section id="reports" class="section" aria-labelledby="reports">
+      <div class="charts" style="margin-bottom:12px">
+        <div class="chart-wrap chart-container panel">
+          <h3 style="margin-top:0">By Category</h3>
+          <canvas id="categoryChart" style="max-width:100%"></canvas>
+        </div>
+        <div class="chart-wrap chart-container panel">
+          <h3 style="margin-top:0">Monthly</h3>
+          <canvas id="monthlyChart" style="max-width:100%"></canvas>
+        </div>
+      </div>
+      <div class="chart-wrap chart-container panel">
+        <h3 style="margin-top:0">Emotion Distribution</h3>
+        <canvas id="emotionChart"></canvas>
+      </div>
+    </section>
+
+    <!-- EMOTIONS -->
+    <section id="emotions" class="section" aria-labelledby="emotions">
+      <div class="panel">
+        <h3 style="margin-top:0">Emotion Insights</h3>
+        <p id="emotion-insight" style="font-weight:600;color:#eaf7ff">No data yet — add expenses with emotions.</p>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settings" class="section" aria-labelledby="settings">
+      <div class="panel">
+        <h3 style="margin-top:0">Settings</h3>
+        <form id="budget-form">
+          <input id="new-budget" type="number" placeholder="Set total budget (₹)" required>
+          <input id="goal-amount" type="number" placeholder="Set savings goal (₹)" required>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <button class="primary" type="submit">Save Budget & Goal</button>
+            <button class="ghost" id="export-btn" type="button">Export CSV</button>
+          </div>
+        </form>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="ghost" id="reset-btn">Reset All Data</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Challenge popup -->
+<div id="challenge-popup" role="dialog" aria-modal="true">
+  <div id="challenge-text" style="font-weight:700"></div>
+  <div style="margin-top:12px;text-align:center"><button onclick="closeChallenge()" class="primary">Got it</button></div>
+</div>
 
 <script>
-// ---------------- JS code ----------------
-let expenses=JSON.parse(localStorage.getItem('expenses'))||[];
-let totalBudget=parseFloat(localStorage.getItem('budget'))||50000;
-let points=parseInt(localStorage.getItem('points'))||0;
-let streakDays=parseInt(localStorage.getItem('streakDays'))||0;
-let lastDate=localStorage.getItem('lastDate')||null;
-let goalAmount=parseFloat(localStorage.getItem('goalAmount'))||10000;
+/* -------------------------
+   App state & persistence
+   ------------------------- */
+let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+let totalBudget = parseFloat(localStorage.getItem('budget')) || 50000;
+let goalAmount = parseFloat(localStorage.getItem('goalAmount')) || 10000;
+let streakDays = parseInt(localStorage.getItem('streakDays')) || 0;
+let lastDate = localStorage.getItem('lastDate') || null;
+let points = parseInt(localStorage.getItem('points')) || 0;
 
-function showSection(id){
-  document.querySelectorAll('main section').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(id==='dashboard') updateDashboard();
-  if(id==='reports') updateCharts();
-  if(id==='emotions') updateEmotionAnalysis();
+/* ---------- UI helpers ---------- */
+const fmt = v => typeof v==='number' ? v.toLocaleString() : v;
+
+/* ---------- Navigation (mobile hamburger) ---------- */
+const hamburger = document.getElementById('hamburger');
+const mobileNav = document.getElementById('mobile-nav');
+hamburger && hamburger.addEventListener('click', () => mobileNav.classList.toggle('show'));
+function mobileNavGo(id){
+  showSection(id);
+  mobileNav.classList.remove('show');
 }
 
-document.getElementById('expense-form').addEventListener('submit',e=>{
-  e.preventDefault();
-  const expense={name:document.getElementById('name').value, amount:parseFloat(document.getElementById('amount').value), date:document.getElementById('date').value, category:document.getElementById('category').value, emotion:document.getElementById('emotion').value};
-  expenses.push(expense);
-  saveData();
-  renderExpenses();
-  updateDashboard();
-  updateCharts();
-  updateEmotionAnalysis();
-  runChallenge(expense);
-  e.target.reset();
-});
+/* set active nav styling */
+function setActiveNav(id){
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  const match = Array.from(document.querySelectorAll('nav a')).find(a => a.textContent.trim().toLowerCase().startsWith(id.replace('-','')));
+  if(match) match.classList.add('active');
+}
 
+/* ---------- Sections ---------- */
+function showSection(id){
+  document.querySelectorAll('main section').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.add('active');
+  setActiveNav(id);
+  // run updates for visible section
+  if(id === 'dashboard') updateDashboard();
+  if(id === 'reports') updateCharts();
+  if(id === 'emotions') updateEmotionAnalysis();
+}
+
+/* ---------- Save / Load ---------- */
+function saveData(){
+  localStorage.setItem('expenses', JSON.stringify(expenses));
+  localStorage.setItem('budget', totalBudget);
+  localStorage.setItem('goalAmount', goalAmount);
+  localStorage.setItem('streakDays', streakDays);
+  localStorage.setItem('lastDate', lastDate);
+  localStorage.setItem('points', points);
+}
+
+/* ---------- Render expenses list & recent ---------- */
 function renderExpenses(){
-  const list=document.getElementById('expense-list');
-  const recent=document.getElementById('recent-expenses');
-  list.innerHTML=''; recent.innerHTML='';
-  expenses.slice().reverse().forEach((e,i)=>{
-    const li=document.createElement('li');
-    li.textContent=`${e.date} | ${e.name} | ₹${e.amount} | ${e.category} | ${e.emotion}`;
-    const del=document.createElement('button'); del.className='delete-btn'; del.textContent='Delete';
-    del.onclick=()=>{expenses.splice(expenses.indexOf(e),1); saveData(); renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();}
-    li.appendChild(del);
+  const list = document.getElementById('expense-list');
+  const recent = document.getElementById('recent-expenses');
+  list.innerHTML = '';
+  recent.innerHTML = '';
+  // newest first
+  expenses.slice().reverse().forEach((e, idx) => {
+    const li = document.createElement('li');
+    li.className = 'expense';
+    li.innerHTML = `<div class="meta"><div class="name">${escapeHtml(e.name)} • ₹${fmt(e.amount)}</div><div class="small">${e.date} • ${escapeHtml(e.category)} • ${escapeHtml(e.emotion)}</div></div>
+      <div style="display:flex;gap:8px;align-items:center"><div style="font-weight:700;color:#fff">₹${fmt(e.amount)}</div>
+      <button class="delete-btn" aria-label="Delete expense">Delete</button></div>`;
+    li.querySelector('.delete-btn').addEventListener('click', () => {
+      const originalIndex = expenses.indexOf(e);
+      if (originalIndex > -1) {
+        expenses.splice(originalIndex, 1);
+        saveData(); renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();
+      }
+    });
     list.appendChild(li);
-    if(i<5){const li2=li.cloneNode(true); li2.removeChild(li2.querySelector('button')); recent.appendChild(li2);}
+    // add to recent (limited)
+    if(idx < 5){
+      const li2 = li.cloneNode(true);
+      li2.querySelector('.delete-btn').remove();
+      recent.appendChild(li2);
+    }
   });
 }
 
+/* simple escape for plain text insertion */
+function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- Dashboard updates ---------- */
 function updateDashboard(){
-  const totalExpense=expenses.reduce((a,b)=>a+b.amount,0);
-  document.getElementById('total-budget').textContent=`₹${totalBudget}`;
-  document.getElementById('total-expense').textContent=`₹${totalExpense}`;
-  const remaining=totalBudget-totalExpense;
-  document.getElementById('remaining-budget').textContent=`₹${remaining}`;
-  document.getElementById('progress-fill').style.width=`${Math.min(100,(totalExpense/totalBudget*100))}%`;
+  const totalExpense = expenses.reduce((a,b) => a + (Number(b.amount)||0), 0);
+  document.getElementById('total-budget').textContent = `₹${fmt(totalBudget)}`;
+  document.getElementById('total-expense').textContent = `₹${fmt(totalExpense)}`;
+  const remaining = totalBudget - totalExpense;
+  document.getElementById('remaining-budget').textContent = `₹${fmt(remaining)}`;
+  // progress fill
+  const progressPct = totalBudget>0 ? Math.min(100, Math.round(totalExpense/totalBudget*100)) : 0;
+  document.getElementById('progress-fill').style.width = progressPct + '%';
 
-  points=totalExpense/100; let level=Math.floor(points/10)+1; document.getElementById('level').textContent=level;
-  document.getElementById('level-fill').style.width=`${Math.min(100,points*10)}%`;
-  document.getElementById('badges').innerHTML=level>2?'<span class="badge">🏆</span>':'';
+  // points & level
+  points = Math.floor(totalExpense/100); // 1 point per 100 spent
+  const level = Math.floor(points/10)+1;
+  document.getElementById('level').textContent = level;
+  document.getElementById('level-fill').style.width = Math.min(100, (points%10)*10) + '%';
+  // badges
+  const badges = [];
+  if(points >= 20) badges.push('Saver');
+  if(points >= 50) badges.push('Budget Master');
+  if(points >= 100) badges.push('Finance Guru');
+  const badgesEl = document.getElementById('badges'); badgesEl.innerHTML = '';
+  badges.forEach(b => {
+    const sp = document.createElement('span'); sp.className = 'badge'; sp.textContent = b + ' 🏆'; badgesEl.appendChild(sp);
+  });
+  if(badges.length) createConfettiSmall();
 
-  const today=new Date().toISOString().split('T')[0];
-  if(lastDate===today){} else if(lastDate===new Date(new Date().setDate(new Date().getDate()-1)).toISOString().split('T')[0]){streakDays++;} else{streakDays=1;}
-  lastDate=today; document.getElementById('streak').textContent=`Streak: ${streakDays} days`;
+  // streak logic: increment if new day called by updateDashboard
+  const today = new Date().toISOString().split('T')[0];
+  if(lastDate === today){
+    // already counted today
+  } else {
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    if(lastDate === yesterday) streakDays++;
+    else streakDays = 1;
+    lastDate = today;
+    saveData();
+  }
+  document.getElementById('streak').textContent = `Streak: ${streakDays} days`;
 
-  document.getElementById('goal-progress').textContent=`₹${totalExpense} / ₹${goalAmount}`;
-  document.getElementById('goal-fill').style.width=`${Math.min(100,(totalExpense/goalAmount*100))}%`;
+  // goal
+  document.getElementById('goal-progress').textContent = `₹${fmt(totalExpense)} / ₹${fmt(goalAmount)}`;
+  const goalPct = goalAmount>0 ? Math.min(100, Math.round(totalExpense/goalAmount*100)) : 0;
+  document.getElementById('goal-fill').style.width = goalPct + '%';
 
-  const cat={} ; expenses.forEach(e=>{cat[e.category]=(cat[e.category]||0)+e.amount;});
-  const topCat=Object.keys(cat).reduce((a,b)=>cat[a]>cat[b]?a:b,'-');
-  document.getElementById('top-category').textContent=topCat;
+  // top category
+  const catTotals = {};
+  expenses.forEach(e => catTotals[e.category] = (catTotals[e.category]||0) + Number(e.amount||0));
+  let topCat = '-';
+  if(Object.keys(catTotals).length){
+    topCat = Object.keys(catTotals).reduce((a,b)=> catTotals[a] >= catTotals[b] ? a : b);
+  }
+  document.getElementById('top-category').textContent = topCat;
 }
 
-// --- Charts ---
+/* ---------- Charts (Chart.js) ---------- */
 let categoryChart=null, monthlyChart=null, emotionChart=null;
 function updateCharts(){
-  const catLabels=[],catData=[];
-  const catMap={}; expenses.forEach(e=>{catMap[e.category]=(catMap[e.category]||0)+e.amount;});
-  for(const c in catMap){catLabels.push(c); catData.push(catMap[c]);}
-  const monthMap={}; expenses.forEach(e=>{const m=e.date.substring(0,7); monthMap[m]=(monthMap[m]||0)+e.amount;});
-  const monthLabels=Object.keys(monthMap); const monthData=Object.values(monthMap);
-  const emoMap={}; expenses.forEach(e=>{emoMap[e.emotion]=(emoMap[e.emotion]||0)+1;});
-  const emoLabels=Object.keys(emoMap); const emoData=Object.values(emoMap);
+  // category
+  const catMap = {}; expenses.forEach(e => { catMap[e.category] = (catMap[e.category]||0) + Number(e.amount||0); });
+  const catLabels = Object.keys(catMap), catData = Object.values(catMap);
 
+  // monthly
+  const mon = {};
+  expenses.forEach(e => {
+    const m = e.date ? e.date.substring(0,7) : new Date().toISOString().slice(0,7);
+    mon[m] = (mon[m]||0) + Number(e.amount||0);
+  });
+  const monthLabels = Object.keys(mon).sort(), monthData = monthLabels.map(l => mon[l]);
+
+  // emotions
+  const emo = {}; expenses.forEach(e=> emo[e.emotion] = (emo[e.emotion]||0) + Number(e.amount||0));
+  const emoLabels = Object.keys(emo), emoData = Object.values(emo);
+
+  // destroy previous charts
   if(categoryChart) categoryChart.destroy();
   if(monthlyChart) monthlyChart.destroy();
   if(emotionChart) emotionChart.destroy();
 
-  const ctx1=document.getElementById('categoryChart').getContext('2d');
-  categoryChart=new Chart(ctx1,{type:'pie',data:{labels:catLabels,datasets:[{data:catData,backgroundColor:['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db']}]}});
+  const ctx1 = document.getElementById('categoryChart').getContext('2d');
+  categoryChart = new Chart(ctx1, {
+    type:'pie',
+    data:{labels:catLabels, datasets:[{data:catData, backgroundColor:['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db']}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}
+  });
 
-  const ctx2=document.getElementById('monthlyChart').getContext('2d');
-  monthlyChart=new Chart(ctx2,{type:'bar',data:{labels:monthLabels,datasets:[{label:'Monthly Expenses',data:monthData,backgroundColor:'#50e3c2'}]}});
+  const ctx2 = document.getElementById('monthlyChart').getContext('2d');
+  monthlyChart = new Chart(ctx2, {
+    type:'bar',
+    data:{labels:monthLabels, datasets:[{label:'Expenses', data:monthData, backgroundColor:'#50e3c2'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+  });
 
-  const ctx3=document.getElementById('emotionChart').getContext('2d');
-  emotionChart=new Chart(ctx3,{type:'doughnut',data:{labels:emoLabels,datasets:[{data:emoData,backgroundColor:['#f5a623','#e74c3c','#9b59b6','#2ecc71','#3498db']}]}});
+  const ctx3 = document.getElementById('emotionChart').getContext('2d');
+  emotionChart = new Chart(ctx3, {
+    type:'doughnut',
+    data:{labels:emoLabels, datasets:[{data:emoData, backgroundColor:['#f5a623','#e74c3c','#9b59b6','#2ecc71','#3498db']}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}
+  });
 
+  // ensure canvases sized nicely on small screens:
+  [document.getElementById('categoryChart'), document.getElementById('monthlyChart'), document.getElementById('emotionChart')].forEach(c => {
+    c.style.height = '240px';
+  });
 }
 
-// --- Emotion Analysis ---
+/* ---------- Emotion insight ---------- */
 function updateEmotionAnalysis(){
-  const emoCount={}; expenses.forEach(e=>{emoCount[e.emotion]=(emoCount[e.emotion]||0)+e.amount;});
-  let maxE=null,maxV=0;
-  for(const e in emoCount){if(emoCount[e]>maxV){maxV=emoCount[e]; maxE=e;}}
-  const insight=maxE?`You spend the most money when you feel ${maxE}.`:'Add some expenses to analyze emotions!';
-  document.getElementById('emotion-insight').textContent=insight;
+  const emoMoney = {};
+  expenses.forEach(e => emoMoney[e.emotion] = (emoMoney[e.emotion]||0) + Number(e.amount||0));
+  let maxE = null, maxV = 0;
+  for(const k in emoMoney){ if(emoMoney[k] > maxV){ maxV = emoMoney[k]; maxE = k; } }
+  const insight = maxE ? `💡 You spend most when you feel ${maxE} (₹${fmt(maxV)}).` : 'Add expenses with emotions to see insights.';
+  document.getElementById('emotion-insight').textContent = insight;
 }
 
-// --- Gamification ---
+/* ---------- Challenges & Confetti ---------- */
 function runChallenge(expense){
-  const text=document.getElementById('challenge-text'); const popup=document.getElementById('challenge-popup');
-  if(expense.amount>5000){text.textContent="💰 Big spending alert! Consider saving some."; popup.style.display='block'; createConfetti();}
-  else if(expense.emotion==='Excited' && expense.amount>1000){text.textContent="🎉 Big spend while excited! Consider saving some."; popup.style.display='block'; createConfetti();}
+  const popup = document.getElementById('challenge-popup');
+  const txt = document.getElementById('challenge-text');
+  if(expense.amount > 5000){
+    txt.textContent = "💰 Big spending alert — consider reviewing this purchase.";
+    popup.style.display = 'block'; createConfettiBurst();
+  } else if(expense.emotion === 'Stressed' && expense.amount > 500){
+    txt.textContent = "⚠️ Spent while stressed — try a calming activity instead of impulse buying.";
+    popup.style.display = 'block'; createConfettiBurst();
+  } else if(expense.emotion === 'Excited' && expense.amount > 1000){
+    txt.textContent = "🎉 Large spend while excited — nice treat! consider setting a saving next.";
+    popup.style.display = 'block'; createConfettiBurst();
+  }
 }
-function closeChallenge(){document.getElementById('challenge-popup').style.display='none';}
-function createConfetti(){for(let i=0;i<30;i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*window.innerWidth+'px';c.style.background=['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db'][Math.floor(Math.random()*5)];document.body.appendChild(c);setTimeout(()=>c.remove(),3000);}}
+function closeChallenge(){ document.getElementById('challenge-popup').style.display = 'none'; }
 
-// --- Save & Load ---
-function saveData(){
-  localStorage.setItem('expenses',JSON.stringify(expenses));
-  localStorage.setItem('budget',totalBudget);
-  localStorage.setItem('points',points);
-  localStorage.setItem('streakDays',streakDays);
-  localStorage.setItem('lastDate',lastDate);
-  localStorage.setItem('goalAmount',goalAmount);
+/* small confetti (subtle) */
+function createConfettiBurst(){
+  for(let i=0;i<18;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = (10 + Math.random()*80) + '%';
+    c.style.top = (10 + Math.random()*40) + '%';
+    c.style.width = (6 + Math.random()*8) + 'px';
+    c.style.height = c.style.width;
+    c.style.background = ['#f39c12','#e74c3c','#9b59b6','#2ecc71','#3498db'][Math.floor(Math.random()*5)];
+    document.body.appendChild(c);
+    const dx = (Math.random()*200)-100, dy = 200 + Math.random()*240;
+    c.animate([{transform:'translateY(0px) rotate(0deg)', opacity:1},{transform:`translate(${dx}px,${dy}px) rotate(${(Math.random()*720)}deg)`, opacity:0}], {duration:1600 + Math.random()*1000, easing:'cubic-bezier(.2,.9,.3,1)'});
+    setTimeout(()=>c.remove(),2400);
+  }
 }
 
-// --- Budget Form ---
-document.getElementById('budget-form').addEventListener('submit',e=>{
+/* subtle confetti when badge unlocked: smaller */
+function createConfettiSmall(){
+  for(let i=0;i<8;i++){
+    const c = document.createElement('div'); c.className='confetti';
+    c.style.left = (30 + Math.random()*40) + '%'; c.style.top = (10 + Math.random()*30) + '%';
+    c.style.width = '6px'; c.style.height = '6px';
+    c.style.background = ['#f5a623','#f39c12','#50e3c2'][Math.floor(Math.random()*3)];
+    document.body.appendChild(c);
+    c.animate([{transform:'translateY(0px)', opacity:1},{transform:`translateY(120px)`, opacity:0}], {duration:900+Math.random()*600, easing:'ease-out'});
+    setTimeout(()=>c.remove(),1600);
+  }
+}
+
+/* ---------- Add expense handler ---------- */
+document.getElementById('expense-form').addEventListener('submit', e => {
   e.preventDefault();
-  totalBudget=parseFloat(document.getElementById('new-budget').value);
-  goalAmount=parseFloat(document.getElementById('goal-amount').value);
-  saveData(); updateDashboard(); e.target.reset();
+  const name = document.getElementById('name').value.trim();
+  const amount = Number(document.getElementById('amount').value);
+  const date = document.getElementById('date').value || new Date().toISOString().split('T')[0];
+  const category = document.getElementById('category').value || 'Others';
+  const emotion = document.getElementById('emotion').value || 'Neutral';
+  if(!name || !amount) return;
+  const exp = { name, amount, date, category, emotion };
+  expenses.push(exp);
+  saveData();
+  renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();
+  runChallenge(exp);
+  e.target.reset();
 });
 
-// --- Reset Data ---
-document.getElementById('reset-btn').addEventListener('click',()=>{if(confirm('Reset all data?')){expenses=[];totalBudget=50000;points=0;streakDays=0;goalAmount=10000;lastDate=null;saveData(); renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();}});
-
-// --- CSV Export ---
-document.getElementById('export-btn').addEventListener('click',()=>{
-  let csv='Date,Name,Amount,Category,Emotion\n';
-  expenses.forEach(e=>{csv+=`${e.date},${e.name},${e.amount},${e.category},${e.emotion}\n`});
-  const blob=new Blob([csv],{type:'text/csv'}); const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download='expenses.csv'; a.click(); URL.revokeObjectURL(url);
+/* ---------- Search ---------- */
+document.getElementById('search-expense').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll('#expense-list li.expense').forEach(li => {
+    li.style.display = li.textContent.toLowerCase().includes(q) ? 'flex' : 'none';
+  });
 });
 
-// --- Search Expenses ---
-document.getElementById('search-expense').addEventListener('input',e=>{
-  const query=e.target.value.toLowerCase();
-  document.querySelectorAll('#expense-list li').forEach(li=>{li.style.display=li.textContent.toLowerCase().includes(query)?'flex':'none';});
+/* ---------- Budget form ---------- */
+document.getElementById('budget-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const nb = Number(document.getElementById('new-budget').value);
+  const ng = Number(document.getElementById('goal-amount').value);
+  if(!isNaN(nb)) totalBudget = nb;
+  if(!isNaN(ng)) goalAmount = ng;
+  saveData(); updateDashboard();
+  e.target.reset();
 });
 
-// --- Initial Render ---
-renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();
+/* ---------- Reset / Export ---------- */
+document.getElementById('reset-btn').addEventListener('click', () => {
+  if(!confirm('Reset all app data? This cannot be undone.')) return;
+  expenses = []; totalBudget = 50000; goalAmount = 10000; streakDays = 0; lastDate = null; points = 0;
+  saveData(); renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();
+});
+document.getElementById('export-btn').addEventListener('click', () => {
+  const header = 'Date,Name,Amount,Category,Emotion\n';
+  const rows = expenses.map(e => `${e.date},${escapeCsv(e.name)},${e.amount},${escapeCsv(e.category)},${escapeCsv(e.emotion)}`).join('\n');
+  const csv = header + rows;
+  const blob = new Blob([csv], {type:'text/csv'}); const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'expenses.csv'; a.click(); URL.revokeObjectURL(url);
+});
+function escapeCsv(s){ return `"${(s+'').replace(/"/g,'""')}"`; }
+
+/* ---------- Utilities ---------- */
+function init(){
+  // initial UI updates
+  renderExpenses(); updateDashboard(); updateCharts(); updateEmotionAnalysis();
+  // mark active nav
+  setActiveNav('dashboard');
+}
+init();
+
+/* ---------- helper to ensure charts redraw on orientation change/resized small screens ---------- */
+window.addEventListener('resize', () => { updateCharts(); });
+
 </script>
 </body>
 </html>
-
