@@ -112,6 +112,8 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
           <input type="password" id="signin-password" placeholder="Enter your password" required>
         </div>
         <button type="submit" class="btn">Sign In</button>
+        <button onclick="window.location.href='index.html'">Login</button>
+
       </form>
       <div class="switch-form">
         Don't have an account? <a id="show-signup">Sign Up</a>
@@ -138,6 +140,8 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:
           <input type="password" id="signup-password" placeholder="Create a password (min 6 characters)" required minlength="6">
         </div>
         <button type="submit" class="btn">Sign Up</button>
+        <button onclick="window.location.href='main.html'">Login</button>
+
       </form>
       <div class="switch-form">
         Already have an account? <a id="show-signin">Sign In</a>
@@ -422,3 +426,4 @@ document.querySelectorAll('input[type="password"]').forEach(input => {
 </script>
 </body>
 </html>	
+
